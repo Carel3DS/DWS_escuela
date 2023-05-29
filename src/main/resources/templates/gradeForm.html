@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Profesor</title>
+</head>
+<body>
+    <img src="/static/logo.png" style="height: 80px" alt="logotipo">
+    <h1>Crear Clase</h1>
+    <form action="/createGrade">
+        <label for="name">Nombre del grado</label><br>
+        <input id="name" name="name"><br>
+        <label for="year">Año</label><br>
+        <input id="year" type="number"><br>
+        <label for="description">Descripción</label><br>
+        <textarea id="description" name="description">Esto es una nueva clase</textarea>
+
+        <br><input type="submit"><br>
+    </form>
+    <br><br><a href="/"><button>Atrás</button></a>
+</body>
+</html>

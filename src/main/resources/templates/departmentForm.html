@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Departamento</title>
+</head>
+<body>
+    <img src="/static/logo.png" style="height: 80px" alt="logotipo">
+    <h1>Crear Departamento</h1>
+    <form action="/createDepartment">
+        <label for="name">Nombre</label><br>
+        <input id="name" name="name"><br>
+        <label for="location">Ubicación</label><br>
+        <input id="location" name="location"><br>
+        <label for="description">Descripción</label><br>
+        <textarea id="description" name="description">Esto es un nuevo departamento</textarea>
+        <p><b>Selecciona profesores:</b></p>
+        <label>
+            <input type="checkbox">
+            Profesor1<br>
+            <input type="checkbox">
+            Profesor2<br>
+            <input type="checkbox">
+            Profesor3<br>
+        </label>
+
+        <br><input type="submit"><br>
+    </form>
+    <br><br><a href="/"><button>Atrás</button></a>
+</body>
+</html>
