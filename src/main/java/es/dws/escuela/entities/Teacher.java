@@ -17,6 +17,7 @@ public class Teacher {
     String name;
     String surname;
     String email;
+    String description;
     Integer age;
 
     //Relationship

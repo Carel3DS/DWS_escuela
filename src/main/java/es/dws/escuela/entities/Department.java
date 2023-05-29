@@ -18,6 +18,7 @@ public class Department {
     String id;
     String name;
     String location;
+    String description;
     @OneToMany
     List<Teacher> teachers;
 

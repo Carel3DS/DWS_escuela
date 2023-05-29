@@ -17,7 +17,9 @@ public class Grade {
     @Id
     Long id;
     String name;
+    String description;
     Integer year;
+
 
     //Relationship
     @ManyToMany
