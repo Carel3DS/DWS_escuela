@@ -3,5 +3,8 @@ package es.dws.escuela.repositories;
 import es.dws.escuela.entities.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TeacherRepository extends JpaRepository<Teacher, String> {
+import java.util.Optional;
+
+public interface TeacherRepository extends JpaRepository<Teacher, Long> {
+    Optional<Teacher> findByName(String name);
 }

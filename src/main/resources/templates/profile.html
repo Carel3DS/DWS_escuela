@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profesor</title>
+</head>
+
+<body>
+    <img src="/static/logo.png" style="height: 80px" alt="logotipo">
+    <h1>Perfil de Profesor</h1>
+    {{#teacher}}
+    <p><b>Nombre:</b>{{name}}</p>
+    <p><b>Rol:</b> Profesor</p>
+    <h4>Descripción</h4>
+    <p style="border: solid 2px; width: 300px; height: 100px">{{description}}</p>
+    <h4>Clases que imparte</h4>
+    <ul>
+        {{#grades}}
+        <li>Clase1</li>
+        <li>Clase2</li>
+        <li>Clase3</li>
+        {{/grades}}
+    </ul>
+    {{/teacher}}
+    <a href="/"><button>Editar perfil</button></a>
+    <a href="/"><button>Atrás</button></a><br><br>
+    <a href="/" style="color: red;" >Eliminar usuario</a>
+
+</body>
+</html>

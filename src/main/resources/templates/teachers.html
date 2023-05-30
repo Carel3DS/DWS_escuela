@@ -13,16 +13,17 @@
         <thead style="border: 1px solid;">
             <tr style="border: 1px solid;">
                 <th style="border: 1px solid;">Nombre</th>
-                <th style="border: 1px solid;">Apellidos</th>
                 <th style="border: 1px solid;">Departamento</th>
             </tr>
         </thead>
         <tbody>
+            {{#teachers}}
             <tr>
-                <td style="border: 1px solid;">Profesor1</td>
-                <td style="border: 1px solid;">Uno</td>
+
+                <td style="border: 1px solid;"><a href="/profile/{{name}}">{{name}}</a></td>
                 <td style="border: 1px solid;">Departamento1</td>
             </tr>
+            {{/teachers}}
         </tbody>
     </table>
 </body>

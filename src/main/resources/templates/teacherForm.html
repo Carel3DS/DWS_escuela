@@ -7,17 +7,17 @@
 <body>
     <img src="/static/logo.png" style="height: 80px" alt="logotipo">
     <h1>Crear Profesor</h1>
-    <form action="/createTeacher">
+    <form action="/teacher/add" method="post">
         <label for="name">Nombre</label><br>
         <input id="name" name="name"><br>
         <label for="surname">Apellidos</label><br>
         <input id="surname" name="surname"><br>
         <label for="age">Edad</label><br>
-        <input id="age" type="number"><br>
+        <input id="age"  name="age" type="number"><br>
         <!--TODO: implement automatic email generator-->
         <label for="email">Correo Electrónico</label><br>
         <input id="email" type="email" name="email"><br>
-        <label for="surname">Contraseña</label><br>
+        <label for="pass">Contraseña</label><br>
         <input id="pass" type="password" name="pass"><br>
         <label for="description">Descripción</label><br>
         <textarea id="description" name="description">Hola, soy un profesor</textarea>

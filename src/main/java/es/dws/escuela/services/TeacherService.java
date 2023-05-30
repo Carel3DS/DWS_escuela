@@ -17,7 +17,7 @@ public class TeacherService {
     @Autowired
     private GradeService gradeService;
     @Autowired
-    private TeacherService teacherService;
+    private DepartmentService departmentService;
 
     public Teacher create(Teacher teacher){
         return repository.save(teacher);
@@ -25,12 +25,17 @@ public class TeacherService {
     public List<Teacher> readAll(){
         return repository.findAll();
     }
-    public Teacher read(String id){
+    public Teacher read(Long id){
         Optional<Teacher> op = repository.findById(id);
         return op.orElse(null);
     }
 
-    public Teacher update(String id, Teacher newTeacher){
+    public Teacher read(String id){
+        Optional<Teacher> op = repository.findByName(id);
+        return op.orElse(null);
+    }
+
+    public Teacher update(Long id, Teacher newTeacher){
         Optional<Teacher> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
@@ -46,7 +51,7 @@ public class TeacherService {
             return null;
         }
     }
-    public Teacher delete(String id){
+    public Teacher delete(Long id){
         Optional<Teacher> op = repository.findById(id);
         if(op.isPresent()){
             repository.deleteById(id);

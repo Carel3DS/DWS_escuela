@@ -1,8 +1,6 @@
 package es.dws.escuela.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,11 +13,17 @@ import java.util.List;
 @Entity
 public class Department {
     @Id
-    String id;
-    String name;
-    String location;
-    String description;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String name;
+    private String location;
+    private String description;
     @OneToMany
-    List<Teacher> teachers;
+    private List<Teacher> teachers;
 
+    public Department(String name, String location, String description) {
+        this.name = name;
+        this.location = location;
+        this.description = description;
+    }
 }

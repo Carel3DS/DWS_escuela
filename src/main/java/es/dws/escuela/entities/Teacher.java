@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -13,16 +14,30 @@ import java.util.List;
 @Entity
 public class Teacher {
     @Id
-    String id;
-    String name;
-    String surname;
-    String email;
-    String description;
-    Integer age;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column(unique = true)
+    private String name;
+    private String surname;
+    private String email;
+    private String password;
+    private String description;
+    private int age;
 
     //Relationship
     @ManyToOne
-    Department department;
+    private Department department;
     @ManyToMany
-    List<Grade> grades;
+    private List<Grade> grades;
+
+    public Teacher(String name, String surname, String email, String password, String description, int age) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.description = description;
+        this.age = age;
+        this.department = null;
+        this.grades = new ArrayList<>();
+    }
 }
