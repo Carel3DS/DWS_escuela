@@ -1,5 +1,6 @@
 package es.dws.escuela.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,10 +29,12 @@ public class Teacher {
     private String password;
     private String description;
 
-    //Relationship
+    //Relationships
     @ManyToOne
     private Department department;
-    @ManyToMany
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "teachers")
     private List<Grade> grades;
 
     public Teacher(String name, String surname, String password, String description, int age) {

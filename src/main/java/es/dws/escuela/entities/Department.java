@@ -1,5 +1,7 @@
 package es.dws.escuela.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +20,10 @@ public class Department {
     private String name;
     private String location;
     private String description;
-    @OneToMany
+
+    //Relationship TODO: fix department's "teachers" view (Use Views implementation)
+    @JsonIgnore
+    @OneToMany(mappedBy = "department")
     private List<Teacher> teachers;
 
     public Department(String name, String location, String description) {

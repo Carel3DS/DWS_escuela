@@ -16,11 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class WebController {
@@ -31,8 +27,6 @@ public class WebController {
     TeacherService teacherService;
     @Autowired
     DepartmentService departmentService;
-    @Autowired
-    private EntityManager entityManager;
 
     @PostConstruct
     public void init(){
@@ -41,7 +35,12 @@ public class WebController {
         Teacher teacher2 = new Teacher("Profesor","Dos","dos","Soy profesor 2",23);
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
+        //Create the department
         departmentService.create(department);
+        //Associate teachers with the department
+        teacher.setDepartment(department);
+        teacher2.setDepartment(department);
+        //Create the instances into the database
         gradeService.create(grade);
         teacherService.create(teacher);
         teacherService.create(teacher2);
