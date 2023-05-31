@@ -7,6 +7,8 @@ import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class WebController {
@@ -27,10 +31,14 @@ public class WebController {
     TeacherService teacherService;
     @Autowired
     DepartmentService departmentService;
+    @Autowired
+    private EntityManager entityManager;
+
     @PostConstruct
     public void init(){
-        Teacher teacher = new Teacher("profesor1","Uno","profesor1@urdj.es","uno","Soy profesor 1",21);
-        Teacher teacher2 = new Teacher("profesor2","Dos","profesor2@urdj.es","dos","Soy profesor 2",23);
+        //E-Mail are generated automatically
+        Teacher teacher = new Teacher("Profesor","Uno","uno","Soy profesor 1",21);
+        Teacher teacher2 = new Teacher("Profesor","Dos","dos","Soy profesor 2",23);
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
         departmentService.create(department);
@@ -38,10 +46,23 @@ public class WebController {
         teacherService.create(teacher);
         teacherService.create(teacher2);
     }
+    //Get all the teachers. There is always at least one teacher, so teacherexists=1
     @GetMapping("/teacher")
     public String getTeachers(Model model){
         model.addAttribute("teachers",teacherService.readAll());
+        model.addAttribute("teacherexists",1);
         return "teachers";
+    }
+    @GetMapping("/teacherByAge")
+    public String getTeachersByAge(Model model, @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "100") int max){
+        if(min <= max && min > 0){
+            List<Teacher> teachers = teacherService.readByAge(min,max);
+            model.addAttribute("teachers", teachers);
+            model.addAttribute("teacherexists",!teachers.isEmpty());
+            return "teachers";
+        }else{
+            return "/";
+        }
     }
     @GetMapping("/department")
     public String getDepartments(Model model){
@@ -55,12 +76,12 @@ public class WebController {
     }
     @GetMapping("/profile/{name}")
     public String getProfile(Model model, @PathVariable String name){
-        Teacher teacher = teacherService.read(name);
+        Teacher teacher = teacherService.read(name.replace(" ",""));
         if(teacher != null){
             model.addAttribute("teacher",teacher);
             return "profile";
         }else{
-            return "../static/index";
+            return "/";
         }
     }
     @GetMapping("/teacher/add")
@@ -76,11 +97,12 @@ public class WebController {
         return "gradeForm";
     }
 
-    //Post
+    //Post controllers
     @PostMapping("/teacher/add")
-    public String postTeacher(@RequestParam String name, @RequestParam String surname, @RequestParam String email, @RequestParam String pass, @RequestParam String description, @RequestParam int    age){
-        teacherService.create(new Teacher(name,surname,email,pass,description,age));
-        return "/teachers";
+    public String postTeacher(Model model, @RequestParam String name, @RequestParam String surname, @RequestParam String pass, @RequestParam String description, @RequestParam int    age){
+        //Only takes the first surname
+        teacherService.create(new Teacher(name,surname.split(" ")[0],pass,description,age));
+        return getTeachers(model);
     }
     @PostMapping("/department/add")
     public String postDepartment(Model model){

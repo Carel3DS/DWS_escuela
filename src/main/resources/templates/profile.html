@@ -9,8 +9,9 @@
     <img src="/static/logo.png" style="height: 80px" alt="logotipo">
     <h1>Perfil de Profesor</h1>
     {{#teacher}}
-    <p><b>Nombre:</b>{{name}}</p>
-    <p><b>Rol:</b> Profesor</p>
+    <p><b>Nombre: </b>{{name}} {{Surname}}</p>
+    <p><b>Rol: </b>Profesor</p>
+    <p><b>Correo: </b>{{email}}</p>
     <h4>Descripción</h4>
     <p style="border: solid 2px; width: 300px; height: 100px">{{description}}</p>
     <h4>Clases que imparte</h4>

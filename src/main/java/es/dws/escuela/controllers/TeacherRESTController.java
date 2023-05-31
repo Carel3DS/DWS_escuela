@@ -42,7 +42,7 @@ public class TeacherRESTController {
     }
 
     @PutMapping("/teacher/{id}")
-    public ResponseEntity<Teacher> put(@RequestParam Long id, @RequestBody Teacher teacher){
+    public ResponseEntity<Teacher> put(@RequestParam String id, @RequestBody Teacher teacher){
         Teacher newTeacher = service.update(id, teacher);
         if (newTeacher != null){
             return new ResponseEntity<>(newTeacher, HttpStatus.OK);
@@ -52,7 +52,7 @@ public class TeacherRESTController {
     }
 
     @DeleteMapping("/teacher/{id}")
-    public ResponseEntity<Teacher> delete(@RequestParam Long id){
+    public ResponseEntity<Teacher> delete(@RequestParam String id){
         Teacher teacher = service.delete(id);
         if (teacher != null){
             return new ResponseEntity<>(teacher, HttpStatus.OK);

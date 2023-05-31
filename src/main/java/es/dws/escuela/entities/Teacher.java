@@ -14,15 +14,19 @@ import java.util.List;
 @Entity
 public class Teacher {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    //Identifier = name.surname, all lowercase without spaces
+    private String id;
     @Column(unique = true)
-    private String name;
-    private String surname;
     private String email;
+    @Column(nullable = false)
+    private String name;
+    @Column(nullable = false)
+    private String surname;
+    @Column(nullable = false)
+    private int age;
+    @Column(nullable = false)
     private String password;
     private String description;
-    private int age;
 
     //Relationship
     @ManyToOne
@@ -30,10 +34,11 @@ public class Teacher {
     @ManyToMany
     private List<Grade> grades;
 
-    public Teacher(String name, String surname, String email, String password, String description, int age) {
+    public Teacher(String name, String surname, String password, String description, int age) {
         this.name = name;
         this.surname = surname;
-        this.email = email;
+        this.id = name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
+        this.email = this.id+"@urdj.es";
         this.password = password;
         this.description = description;
         this.age = age;

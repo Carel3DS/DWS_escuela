@@ -9,22 +9,38 @@
     <img src="/static/logo.png" style="height: 80px" alt="logotipo">
     <h1>Lista de profesores</h1>
     <a href="/"><button>Atrás</button></a><br><br>
+    <div style="padding-bottom: 20px">
+        <p>Filtro de edad:</p>
+        <form action="/teacherByAge">
+            <label for="min">minimo</label>
+            <input name="min" id="min" type="number">
+            <label for="max">maximo</label>
+            <input name="max" id="max" type="number">
+            <input type="submit">
+        </form>
+    </div>
+    {{^teachers}}
+    <p><i>No se ha encontrado profesores con este rango de edades</i></p>
+    {{/teachers}}
+    {{#teacherexists}}
     <table style="border: 1px solid;">
         <thead style="border: 1px solid;">
             <tr style="border: 1px solid;">
-                <th style="border: 1px solid;">Nombre</th>
+                <th style="border: 1px solid;">Nombre del profesor</th>
+                <th style="border: 1px solid;">Edad</th>
                 <th style="border: 1px solid;">Departamento</th>
             </tr>
         </thead>
         <tbody>
             {{#teachers}}
             <tr>
-
-                <td style="border: 1px solid;"><a href="/profile/{{name}}">{{name}}</a></td>
+                <td style="border: 1px solid;"><a href="/profile/{{name}}.{{surname}}">{{name}} {{surname}}</a></td>
+                <td style="border: 1px solid;">{{age}}</td>
                 <td style="border: 1px solid;">Departamento1</td>
             </tr>
             {{/teachers}}
         </tbody>
     </table>
+    {{/teacherexists}}
 </body>
 </html>

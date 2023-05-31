@@ -2,6 +2,8 @@ package es.dws.escuela.services;
 
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.TeacherRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,8 @@ import java.util.Optional;
 public class TeacherService {
     @Autowired
     private TeacherRepository repository;
+    @Autowired
+    private EntityManager entityManager;
 
     //RELATIONSHIP
     @Autowired
@@ -22,20 +26,31 @@ public class TeacherService {
     public Teacher create(Teacher teacher){
         return repository.save(teacher);
     }
+
+    //Read all the teachers saved in repository
     public List<Teacher> readAll(){
         return repository.findAll();
     }
-    public Teacher read(Long id){
+
+    //Read by age range
+    public List<Teacher> readByAge(int min, int max) {
+        TypedQuery<Teacher>  tq = entityManager.createQuery("SELECT t FROM Teacher t where t.age >= ?1 and t.age <= ?2", Teacher.class);
+        tq.setParameter(1, min);
+        tq.setParameter(2, max);
+        return tq.getResultList();
+    }
+    //Read by known ID
+    public Teacher read(String id){
         Optional<Teacher> op = repository.findById(id);
         return op.orElse(null);
     }
+    //Read by known Name and Surname
 
-    public Teacher read(String id){
-        Optional<Teacher> op = repository.findByName(id);
+    public Teacher read(String name, String surname){
+        Optional<Teacher> op = repository.findByNameAndSurname(name,surname);
         return op.orElse(null);
     }
-
-    public Teacher update(Long id, Teacher newTeacher){
+    public Teacher update(String id, Teacher newTeacher){
         Optional<Teacher> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
@@ -51,7 +66,8 @@ public class TeacherService {
             return null;
         }
     }
-    public Teacher delete(Long id){
+
+    public Teacher delete(String id){
         Optional<Teacher> op = repository.findById(id);
         if(op.isPresent()){
             repository.deleteById(id);

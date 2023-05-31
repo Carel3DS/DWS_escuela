@@ -7,6 +7,7 @@
 <body>
     <img src="/static/logo.png" style="height: 80px" alt="logotipo">
     <h1>Crear Profesor</h1>
+    <p><b>Nota:</b> la cuenta de correo se genera automáticamente</p>
     <form action="/teacher/add" method="post">
         <label for="name">Nombre</label><br>
         <input id="name" name="name"><br>
@@ -14,9 +15,6 @@
         <input id="surname" name="surname"><br>
         <label for="age">Edad</label><br>
         <input id="age"  name="age" type="number"><br>
-        <!--TODO: implement automatic email generator-->
-        <label for="email">Correo Electrónico</label><br>
-        <input id="email" type="email" name="email"><br>
         <label for="pass">Contraseña</label><br>
         <input id="pass" type="password" name="pass"><br>
         <label for="description">Descripción</label><br>
