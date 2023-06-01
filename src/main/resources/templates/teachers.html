@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <img src="/static/logo.png" style="height: 80px" alt="logotipo">
+    <img src="/logo.png" style="height: 80px" alt="logotipo">
     <h1>Lista de profesores</h1>
     <a href="/"><button>Atrás</button></a><br><br>
     <div style="padding-bottom: 20px">
@@ -34,7 +34,7 @@
         <tbody>
             {{#teachers}}
             <tr>
-                <td style="border: 1px solid;"><a href="/profile/{{name}}.{{surname}}">{{name}} {{surname}}</a></td>
+                <td style="border: 1px solid;"><a href="/profile/{{id}}">{{name}} {{surname}}</a></td>
                 <td style="border: 1px solid;">{{age}}</td>
                 <td style="border: 1px solid;">Departamento1</td>
             </tr>

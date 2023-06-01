@@ -73,9 +73,9 @@ public class WebController {
         model.addAttribute("grade",gradeService.readAll());
         return "grades";
     }
-    @GetMapping("/profile/{name}")
-    public String getProfile(Model model, @PathVariable String name){
-        Teacher teacher = teacherService.read(name.replace(" ",""));
+    @GetMapping("/profile/{id}")
+    public String getProfile(Model model, @PathVariable String id){
+        Teacher teacher = teacherService.read(id);
         if(teacher != null){
             model.addAttribute("teacher",teacher);
             return "profile";
@@ -83,8 +83,10 @@ public class WebController {
             return "/";
         }
     }
+
     @GetMapping("/teacher/add")
     public String getTeacherForm(Model model){
+        model.addAttribute("ignore",1);
         return "teacherForm";
     }
     @GetMapping("/department/add")
@@ -110,5 +112,38 @@ public class WebController {
     @PostMapping("/grade/add")
     public String postGrade(Model model){
         return "grades";
+    }
+
+    //Edit controllers
+    @GetMapping("/profile/edit")
+    public String editTeacher(Model model, @RequestParam String id){
+        Teacher teacher = teacherService.read(id);
+        if(teacher != null){
+            model.addAttribute("teacher",teacher);
+            //model.addAttribute("ignore",0);
+            return "teacherForm";
+        }else{
+            return "/";
+        }
+    }
+    @PostMapping("/profile/edit")
+    public String putEditTeacher(Model model, @RequestParam String id, @RequestParam String pass, @RequestParam String description, @RequestParam int age){
+        if(teacherService.update(id,new Teacher("","",pass,description,age)) != null){
+            return getProfile(model,id);
+        }else {
+            return "/";
+        }
+    }
+    //TODO: implement edit controllers for Grade and Department
+
+    //Delete controllers
+    @GetMapping("/profile/delete")
+    public String deleteTeacher(Model model, @RequestParam String id){
+        if(teacherService.read(id) != null){
+            teacherService.delete(id);
+            return getTeachers(model);
+        }else{
+            return "/";
+        }
     }
 }

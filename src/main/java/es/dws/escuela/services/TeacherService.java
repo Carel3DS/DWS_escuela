@@ -55,11 +55,9 @@ public class TeacherService {
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             Teacher teacher = op.get();
-            teacher.setName(newTeacher.getName());
-            teacher.setSurname(newTeacher.getSurname());
             teacher.setDescription(newTeacher.getDescription());
-            teacher.setEmail(newTeacher.getEmail());
-            //Does this overwrite the teacher identified by id?
+            teacher.setPassword(newTeacher.getPassword());
+            teacher.setAge(newTeacher.getAge());
             repository.save(teacher);
             return teacher;
         }else{

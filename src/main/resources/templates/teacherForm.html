@@ -5,20 +5,22 @@
     <title>Crear Profesor</title>
 </head>
 <body>
-    <img src="/static/logo.png" style="height: 80px" alt="logotipo">
-    <h1>Crear Profesor</h1>
+    <img src="/logo.png" style="height: 80px" alt="logotipo">
+    <h1>{{#ignore}}Crear Profesor{{/ignore}}{{^ignore}}Editar perfil{{/ignore}}</h1>
     <p><b>Nota:</b> la cuenta de correo se genera automáticamente</p>
-    <form action="/teacher/add" method="post">
+    <form action="{{#ignore}}/teacher/add{{/ignore}}{{^ignore}}/profile/edit?id={{teacher.id}}{{/ignore}}" method="post">
+        {{#ignore}}
         <label for="name">Nombre</label><br>
-        <input id="name" name="name"><br>
+        <input id="name"  name="name"><br>
         <label for="surname">Apellidos</label><br>
         <input id="surname" name="surname"><br>
+        {{/ignore}}
         <label for="age">Edad</label><br>
-        <input id="age"  name="age" type="number"><br>
+        <input id="age"  name="age" {{^ignore}}value="{{teacher.age}}"{{/ignore}} type="number"><br>
         <label for="pass">Contraseña</label><br>
-        <input id="pass" type="password" name="pass"><br>
+        <input id="pass" type="password" {{^ignore}} value="{{teacher.password}}" {{/ignore}} name="pass"><br>
         <label for="description">Descripción</label><br>
-        <textarea id="description" name="description">Hola, soy un profesor</textarea>
+        <textarea id="description"  name="description">{{^ignore}}{{teacher.description}}{{/ignore}}{{#ignore}}Hola, soy un profesor{{/ignore}}</textarea>
 
         <br><input type="submit"><br>
     </form>
