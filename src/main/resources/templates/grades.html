@@ -9,6 +9,8 @@
     <img src="/logo.png" style="height: 80px" alt="logotipo">
     <h1>Lista de Clases</h1>
     <a href="/"><button>Atrás</button></a><br><br>
+    {{^gradeexists}}<p><i>En estos momentos no hay ninguna clase disponible</i></p>{{/gradeexists}}
+    {{#gradeexists}}
     <table style="border: 1px solid;">
         <thead style="border: 1px solid;">
             <tr style="border: 1px solid;">
@@ -18,12 +20,16 @@
             </tr>
         </thead>
         <tbody>
+        {{#grade}}
             <tr>
-                <td style="border: 1px solid;">Ciberseguridad</td>
-                <td style="border: 1px solid;">2023</td>
-                <td style="border: 1px solid;">Profesor1</td>
+                <td style="border: 1px solid;">{{name}}</td>
+                <td style="border: 1px solid;">{{year}}</td>
+                <td style="border: 1px solid;">{{teacher.name}}</td>
+                <td style="border: 1px solid;"><a href="/">Editar</a></td>
             </tr>
         </tbody>
+        {{/grade}}
     </table>
+    {{/gradeexists}}
 </body>
 </html>

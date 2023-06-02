@@ -1,6 +1,9 @@
 package es.dws.escuela.services;
 
 import es.dws.escuela.entities.Grade;
+import es.dws.escuela.entities.Grade;
+import es.dws.escuela.entities.Grade;
+import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.GradeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,5 +50,32 @@ public class GradeService {
         }else{
             return null;
         }
+    }
+
+    void addTeacher(Teacher teacher, Long gradeId) {
+        Grade grade = this.read(gradeId);
+        List<Teacher> teachers = grade.getTeachers();
+        teachers.add(teacher);
+        grade.setTeachers(teachers);
+        repository.save(grade);
+    }
+
+    public void removeTeacherFromGrade(Long id, String teacherId) {
+        Grade grade = this.read(id);
+        List<Teacher> teachers = grade.getTeachers();
+        boolean found = false;
+        int i = 0;
+        //Find the teacher and remove from the list (O(N))
+        while (!found){
+            Teacher t = teachers.get(i);
+            if (t.getId().equals(teacherId)){
+                teachers.remove(i);
+                found = true;
+            }else {
+                i++;
+            }
+        }
+        grade.setTeachers(teachers);
+        repository.save(grade);
     }
 }

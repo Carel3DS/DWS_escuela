@@ -146,4 +146,22 @@ public class WebController {
             return "/";
         }
     }
+    @GetMapping("/department/delete")
+    public String deleteDepartment(Model model, @RequestParam Long id){
+        if(departmentService.read(id) != null){
+            departmentService.delete(id);
+            return getDepartments(model);
+        }else{
+            return "/";
+        }
+    }
+    @GetMapping("/profile/delete")
+    public String deleteGrade(Model model, @RequestParam Long id){
+        if(gradeService.read(id) != null){
+            gradeService.delete(id);
+            return getGrades(model);
+        }else{
+            return "/";
+        }
+    }
 }

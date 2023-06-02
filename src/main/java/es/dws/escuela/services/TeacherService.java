@@ -1,5 +1,7 @@
 package es.dws.escuela.services;
 
+import es.dws.escuela.entities.Department;
+import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.TeacherRepository;
 import jakarta.persistence.EntityManager;
@@ -45,7 +47,6 @@ public class TeacherService {
         return op.orElse(null);
     }
     //Read by known Name and Surname
-
     public Teacher read(String name, String surname){
         Optional<Teacher> op = repository.findByNameAndSurname(name,surname);
         return op.orElse(null);
@@ -71,6 +72,49 @@ public class TeacherService {
             repository.deleteById(id);
             return op.get();
         }else{
+            return null;
+        }
+    }
+
+    //Non-standard queries
+
+    //Assign teacher to department
+    public Teacher assignDept(String teacherId, Long deptId){
+        Teacher teacher = this.read(teacherId);
+        if (teacher != null){
+            Department department = this.departmentService.read(deptId);
+            if(department != null){
+                Department oldDep = teacher.getDepartment();
+                if(oldDep!=null){
+                    departmentService.removeTeacherFromDept(oldDep.getId(),teacherId);
+                }
+                teacher.setDepartment(department);
+                repository.save(teacher);
+                this.departmentService.addTeacher(teacher,deptId);
+                return teacher;
+            }else {
+                return null;
+            }
+        }else {
+            return null;
+        }
+    }
+
+    //Assign teacher to grade
+    public Teacher assignGrade(String teacherId, Long deptId){
+        Teacher teacher = this.read(teacherId);
+        if (teacher != null){
+            Grade grade = this.gradeService.read(deptId);
+            if(grade != null){
+                List<Grade> grades = teacher.getGrades();
+                grades.add(grade);
+                teacher.setGrades(grades);
+                this.gradeService.addTeacher(teacher,deptId);
+                return teacher;
+            }else {
+                return null;
+            }
+        }else {
             return null;
         }
     }

@@ -1,6 +1,7 @@
 package es.dws.escuela.services;
 
 import es.dws.escuela.entities.Department;
+import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,5 +49,35 @@ public class DepartmentService {
         }else{
             return null;
         }
+    }
+
+    //Non-standard queries
+
+    //Add teacher to department (package view only)
+    void addTeacher(Teacher teacher, Long deptId){
+        Department department = this.read(deptId);
+        List<Teacher> teachers = department.getTeachers();
+        teachers.add(teacher);
+        department.setTeachers(teachers);
+        repository.save(department);
+    }
+
+    public void removeTeacherFromDept(Long id, String teacherId) {
+        Department department = this.read(id);
+        List<Teacher> teachers = department.getTeachers();
+        boolean found = false;
+        int i = 0;
+        //Find the teacher and remove from the list (O(N))
+        while (!found){
+            Teacher t = teachers.get(i);
+            if (t.getId().equals(teacherId)){
+                teachers.remove(i);
+                found = true;
+            }else {
+                i++;
+            }
+        }
+        department.setTeachers(teachers);
+        repository.save(department);
     }
 }
