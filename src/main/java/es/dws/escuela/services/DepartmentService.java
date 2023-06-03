@@ -41,11 +41,23 @@ public class DepartmentService {
             return null;
         }
     }
+
     public Department delete(Long id){
         Optional<Department> op = repository.findById(id);
         if(op.isPresent()){
+            Department d = op.get();
+            for(Teacher t:d.getTeachers()){
+                t.setDepartment(null);
+            }
+            //Save changes
+            repository.save(d);
+            //Clear teachers list
+            d.getTeachers().clear();
+            //Save changes again
+            repository.save(d);
+            //Delete safely by id
             repository.deleteById(id);
-            return op.get();
+            return d;
         }else{
             return null;
         }
@@ -56,9 +68,7 @@ public class DepartmentService {
     //Add teacher to department (package view only)
     void addTeacher(Teacher teacher, Long deptId){
         Department department = this.read(deptId);
-        List<Teacher> teachers = department.getTeachers();
-        teachers.add(teacher);
-        department.setTeachers(teachers);
+        department.addTeacher(teacher);
         repository.save(department);
     }
 

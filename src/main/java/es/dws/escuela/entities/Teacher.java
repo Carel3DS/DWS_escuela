@@ -59,9 +59,11 @@ public class Teacher {
 
     public void addGrade(Grade grade) {
         this.grades.add(grade);
+        grade.getTeachers().add(this);
     }
     public void removeGrade(Grade grade){
         this.grades.remove(grade);
+        grade.getTeachers().remove(this);
     }
 
 }

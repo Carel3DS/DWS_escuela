@@ -42,11 +42,26 @@ public class GradeService {
             return null;
         }
     }
+
     public Grade delete(Long id){
         Optional<Grade> op = repository.findById(id);
         if(op.isPresent()){
+            Grade g = op.get();
+            //Remove reference of the grade for each teacher if there are teachers
+            if(!g.getTeachers().isEmpty()){
+                for(Teacher t:g.getTeachers()){
+                    t.removeGrade(g);
+                }
+            }
+            //Save the changes
+            repository.save(g);
+            //Clear teachers list
+            g.getTeachers().clear();
+            //Save again
+            repository.save(g);
+            //Delete safely by ID
             repository.deleteById(id);
-            return op.get();
+            return g;
         }else{
             return null;
         }

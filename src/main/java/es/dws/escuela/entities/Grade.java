@@ -40,6 +40,7 @@ public class Grade {
 
     public void addTeacher(Teacher teacher) {
         this.teachers.add(teacher);
+        teacher.getGrades().add(this);
     }
 
     public void removeTeacher(String teacherId){
@@ -55,5 +56,8 @@ public class Grade {
                 i++;
             }
         }
+    }
+    public void removeTeacher(Teacher teacher){
+        this.teachers.remove(teacher);
     }
 }

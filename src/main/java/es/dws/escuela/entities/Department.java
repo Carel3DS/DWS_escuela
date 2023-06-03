@@ -53,4 +53,8 @@ public class Department {
             }
         }
     }
+
+    public void removeTeacher(Teacher teacher) {
+        this.teachers.remove(teacher);
+    }
 }

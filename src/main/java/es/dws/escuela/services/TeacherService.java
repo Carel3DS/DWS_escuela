@@ -65,8 +65,13 @@ public class TeacherService {
     public Teacher delete(String id){
         Optional<Teacher> op = repository.findById(id);
         if(op.isPresent()){
+            Teacher t = op.get();
+            //Clear grades list and department
+            this.removeAllGrades(id);
+            this.removeDept(id);
+            //Delete safely by ID
             repository.deleteById(id);
-            return op.get();
+            return t;
         }else{
             return null;
         }
@@ -113,8 +118,7 @@ public class TeacherService {
         }
     }
 
-    //remove grade from teacher if assigned
-    //TODO: remove grade if there are no teachers
+    //remove grade from teacher if assigned. Delete grade if the grade has no teachers
     public Teacher removeGrade(String teacherId, Long gradeId){
         Teacher teacher = this.read(teacherId);
         if (teacher != null){
@@ -122,6 +126,32 @@ public class TeacherService {
             if(grade != null){
                 teacher.removeGrade(grade);
                 this.gradeService.removeTeacherFromGrade(gradeId,teacherId);
+                if(grade.getTeachers().isEmpty()){
+                    gradeService.delete(gradeId);
+                }
+                return teacher;
+            }else {
+                return null;
+            }
+        }else {
+            return null;
+        }
+    }
+
+    //Remove all the grades from the grade list of the teacher. Delete grades if the grades have no teachers
+    public Teacher removeAllGrades(String teacherId){
+        Optional<Teacher> op = repository.findById(teacherId);
+        if(op.isPresent()){
+            Teacher teacher = op.get();
+            if (!teacher.getGrades().isEmpty()){
+                for(Grade g:teacher.getGrades()){
+                    g.removeTeacher(teacher);
+                    if(g.getTeachers().isEmpty()){
+                        gradeService.delete(g.getId());
+                    }
+                }
+                teacher.getGrades().clear();
+                repository.save(teacher);
                 return teacher;
             }else {
                 return null;
@@ -134,9 +164,9 @@ public class TeacherService {
     public Teacher removeDept(String teacherId) {
         Teacher teacher = this.read(teacherId);
         if (teacher != null){
-            Long deptId = teacher.getDepartment().getId();
-            if(deptId != null){
-                this.departmentService.removeTeacherFromDept(deptId,teacherId);
+            Department department = teacher.getDepartment();
+            if(department != null){
+                department.removeTeacher(teacher);
                 teacher.setDepartment(null);
                 repository.save(teacher);
                 return teacher;
