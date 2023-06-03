@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crear Profesor</title>
+    <title>Crear Clase</title>
 </head>
 <body>
     <img src="/logo.png" style="height: 80px" alt="logotipo">
-    <h1>Crear Clase</h1>
-    <form action="/createGrade">
+    <h1>{{#ignore}}Crear Clase{{/ignore}}{{^ignore}}Editar clase{{/ignore}}</h1>
+    <form action="{{#ignore}}/grade/add{{/ignore}}{{^ignore}}/grade/edit?id={{id}}{{/ignore}}" method="post">
         <label for="name">Nombre del grado</label><br>
-        <input id="name" name="name"><br>
+        <input id="name" {{^ignore}}value="{{name}}"{{/ignore}} name="name"><br>
         <label for="year">Año</label><br>
-        <input id="year" type="number"><br>
+        <input id="year" {{^ignore}}value="{{year}}"{{/ignore}} name="year" type="number"><br>
         <label for="description">Descripción</label><br>
-        <textarea id="description" name="description">Esto es una nueva clase</textarea>
+        <textarea id="description" name="description">{{#ignore}}Esto es una nueva clase{{/ignore}}{{^ignore}}{{description}}{{/ignore}}</textarea>
 
         <br><input type="submit"><br>
     </form>

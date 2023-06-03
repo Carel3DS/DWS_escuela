@@ -69,12 +69,16 @@ public class WebController {
     }
     @GetMapping("/department")
     public String getDepartments(Model model){
-        model.addAttribute("department",departmentService.readAll());
+        List<Department> departments = departmentService.readAll();
+        model.addAttribute("department",departments);
+        model.addAttribute("departmentexists", !departments.isEmpty());
         return "departments";
     }
     @GetMapping("/grade")
     public String getGrades(Model model){
-        model.addAttribute("grade",gradeService.readAll());
+        List<Grade> grades = gradeService.readAll();
+        model.addAttribute("grade",grades);
+        model.addAttribute("gradeexists", !grades.isEmpty());
         return "grades";
     }
     @GetMapping("/profile/{id}")
@@ -88,6 +92,7 @@ public class WebController {
         }
     }
 
+    //Entity forms
     @GetMapping("/teacher/add")
     public String getTeacherForm(Model model){
         model.addAttribute("ignore",1);
@@ -95,10 +100,12 @@ public class WebController {
     }
     @GetMapping("/department/add")
     public String getDepartmentForm(Model model){
+        model.addAttribute("ignore",1);
         return "departmentForm";
     }
     @GetMapping("/grade/add")
     public String getGradeForm(Model model){
+        model.addAttribute("ignore",1);
         return "gradeForm";
     }
 
@@ -110,11 +117,13 @@ public class WebController {
         return getTeachers(model);
     }
     @PostMapping("/department/add")
-    public String postDepartment(Model model){
-        return "departments";
+    public String postDepartment(Model model, @RequestParam String name, @RequestParam String location, @RequestParam String description){
+        departmentService.create(new Department(name,location,description));
+        return getDepartments(model);
     }
     @PostMapping("/grade/add")
-    public String postGrade(Model model){
+    public String postGrade(Model model, @RequestParam String name, @RequestParam Integer year, @RequestParam String description){
+        gradeService.create(new Grade(name,description,year));
         return "grades";
     }
 
@@ -151,7 +160,7 @@ public class WebController {
     }
     @PostMapping("/grade/edit")
     public String putEditGrade(Model model, @RequestParam Long id, @RequestParam String name, @RequestParam String description, @RequestParam int year){
-        if(gradeService.update(id,new Grade("",description,year)) != null){
+        if(gradeService.update(id,new Grade(name,description,year)) != null){
             return getGrades(model);
         }else {
             return "/";

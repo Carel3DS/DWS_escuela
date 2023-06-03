@@ -6,23 +6,14 @@
 </head>
 <body>
     <img src="/logo.png" style="height: 80px" alt="logotipo">
-    <h1>Crear Departamento</h1>
-    <form action="/department/add" method="post">
-        <label for="name">Nombre</label><br>
-        <input id="name" name="name"><br>
+    <h1>{{#ignore}}Crear departamento{{/ignore}}{{^ignore}}Editar departamento{{/ignore}}</h1>
+    <form action="{{#ignore}}/department/add{{/ignore}}{{^ignore}}/department/edit?id={{id}}{{/ignore}}" method="post">
+        <label for="name">Nombre del grado</label><br>
+        <input id="name" {{^ignore}}value="{{name}}"{{/ignore}} name="name"><br>
         <label for="location">Ubicación</label><br>
-        <input id="location" name="location"><br>
+        <input id="location" {{^ignore}}value="{{location}}"{{/ignore}} name="location"><br>
         <label for="description">Descripción</label><br>
-        <textarea id="description" name="description">Esto es un nuevo departamento</textarea>
-        <p><b>Selecciona profesores:</b></p>
-        <label>
-            <input type="checkbox">
-            Profesor1<br>
-            <input type="checkbox">
-            Profesor2<br>
-            <input type="checkbox">
-            Profesor3<br>
-        </label>
+        <textarea id="description" name="description">{{#ignore}}Esto es un nuevo departamento{{/ignore}}{{^ignore}}{{description}}{{/ignore}}</textarea>
 
         <br><input type="submit"><br>
     </form>
