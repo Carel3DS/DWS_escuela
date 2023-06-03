@@ -64,20 +64,7 @@ public class DepartmentService {
 
     public void removeTeacherFromDept(Long id, String teacherId) {
         Department department = this.read(id);
-        List<Teacher> teachers = department.getTeachers();
-        boolean found = false;
-        int i = 0;
-        //Find the teacher and remove from the list (O(N))
-        while (!found){
-            Teacher t = teachers.get(i);
-            if (t.getId().equals(teacherId)){
-                teachers.remove(i);
-                found = true;
-            }else {
-                i++;
-            }
-        }
-        department.setTeachers(teachers);
+        department.removeTeacher(teacherId);
         repository.save(department);
     }
 }

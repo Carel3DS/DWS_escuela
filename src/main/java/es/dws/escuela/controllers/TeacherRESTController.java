@@ -1,6 +1,8 @@
 package es.dws.escuela.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import es.dws.escuela.entities.Teacher;
+import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
@@ -23,15 +25,18 @@ public class TeacherRESTController {
     private DepartmentService departmentService;
     //REST TEACHER
     @PostMapping("/teacher")
+    @JsonView(Views.Teacher.class)
     public ResponseEntity<Teacher> post(@RequestBody Teacher teacher){
         return new ResponseEntity<>(service.create(teacher),HttpStatus.CREATED);
     }
     @GetMapping("/teacher")
+    @JsonView(Views.Teacher.class)
     public ResponseEntity<List<Teacher>> getAllTeachers(){
         return new ResponseEntity<>(service.readAll(), HttpStatus.OK);
     }
 
     @GetMapping("/teacher/{id}")
+    @JsonView(Views.Teacher.class)
     public ResponseEntity<Teacher> get(@RequestParam String id){
         Teacher teacher = service.read(id);
         if (teacher != null){
@@ -42,6 +47,7 @@ public class TeacherRESTController {
     }
 
     @PutMapping("/teacher/{id}")
+    @JsonView(Views.Teacher.class)
     public ResponseEntity<Teacher> put(@RequestParam String id, @RequestBody Teacher teacher){
         Teacher newTeacher = service.update(id, teacher);
         if (newTeacher != null){
@@ -52,6 +58,7 @@ public class TeacherRESTController {
     }
 
     @DeleteMapping("/teacher/{id}")
+    @JsonView(Views.Teacher.class)
     public ResponseEntity<Teacher> delete(@RequestParam String id){
         Teacher teacher = service.delete(id);
         if (teacher != null){

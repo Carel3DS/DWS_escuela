@@ -1,6 +1,8 @@
 package es.dws.escuela.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import es.dws.escuela.entities.Grade;
+import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +22,18 @@ public class GradeRESTController {
     private TeacherService teacherService;
     //REST GRADE
     @PostMapping("/grade")
+    @JsonView(Views.Grade.class)
     public ResponseEntity<Grade> post(@RequestBody Grade grade){
         return new ResponseEntity<>(service.create(grade),HttpStatus.CREATED);
     }
     @GetMapping("/grade")
+    @JsonView(Views.Grade.class)
     public ResponseEntity<List<Grade>> getAllGrades(){
         return new ResponseEntity<>(service.readAll(), HttpStatus.OK);
     }
 
     @GetMapping("/grade/{id}")
+    @JsonView(Views.Grade.class)
     public ResponseEntity<Grade> get(@RequestParam Long id){
         Grade grade = service.read(id);
         if (grade != null){
@@ -39,6 +44,7 @@ public class GradeRESTController {
     }
 
     @PutMapping("/grade/{id}")
+    @JsonView(Views.Grade.class)
     public ResponseEntity<Grade> put(@RequestParam Long id, @RequestBody Grade grade){
         Grade newGrade = service.update(id, grade);
         if (newGrade != null){
@@ -49,6 +55,7 @@ public class GradeRESTController {
     }
 
     @DeleteMapping("/grade/{id}")
+    @JsonView(Views.Grade.class)
     public ResponseEntity<Grade> delete(@RequestParam Long id){
         Grade grade = service.delete(id);
         if (grade != null){
