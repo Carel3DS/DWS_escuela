@@ -21,9 +21,9 @@
         <tbody>
         {{#grade}}
             <tr>
-                <td style="border: 1px solid;">{{name}}</td>
+                <td style="border: 1px solid;"><a href="/grade/{{id}}">{{name}}</a></td>
                 <td style="border: 1px solid;">{{year}}</td>
-                <td style="border: 1px solid;"><a href="/">Editar</a></td>
+                <td style="border: 1px solid;"><a href="/grade/edit?id={{id}}">Editar</a></td>
             </tr>
         </tbody>
         {{/grade}}

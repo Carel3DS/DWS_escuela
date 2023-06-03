@@ -21,9 +21,9 @@
         <tbody>
         {{#department}}
             <tr>
-                <td style="border: 1px solid;">{{name}}</td>
+                <td style="border: 1px solid;"><a href="/department/{{id}}">{{name}}</a></td>
                 <td style="border: 1px solid;">{{location}}</td>
-                <td style="border: 1px solid;"><a href="/">Editar</a></td>
+                <td style="border: 1px solid;"><a href="department/edit?id={{id}}">Editar</a></td>
             </tr>
         {{/department}}
         </tbody>

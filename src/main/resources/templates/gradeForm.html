@@ -7,16 +7,18 @@
 <body>
     <img src="/logo.png" style="height: 80px" alt="logotipo">
     <h1>{{#ignore}}Crear Clase{{/ignore}}{{^ignore}}Editar clase{{/ignore}}</h1>
-    <form action="{{#ignore}}/grade/add{{/ignore}}{{^ignore}}/grade/edit?id={{id}}{{/ignore}}" method="post">
+
+    <form action="{{#ignore}}/grade/add{{/ignore}}{{^ignore}}/grade/edit?id={{grade.id}}{{/ignore}}" method="post">
         <label for="name">Nombre del grado</label><br>
-        <input id="name" {{^ignore}}value="{{name}}"{{/ignore}} name="name"><br>
+        <input id="name" {{^ignore}}value="{{grade.name}}"{{/ignore}} name="name"><br>
         <label for="year">Año</label><br>
-        <input id="year" {{^ignore}}value="{{year}}"{{/ignore}} name="year" type="number"><br>
+        <input id="year" {{^ignore}}value="{{grade.year}}"{{/ignore}} name="year" type="number"><br>
         <label for="description">Descripción</label><br>
-        <textarea id="description" name="description">{{#ignore}}Esto es una nueva clase{{/ignore}}{{^ignore}}{{description}}{{/ignore}}</textarea>
+        <textarea id="description" name="description">{{#ignore}}Esto es una nueva clase{{/ignore}}{{^ignore}}{{grade.description}}{{/ignore}}</textarea>
 
         <br><input type="submit"><br>
     </form>
+
     <br><br><a href="/"><button>Atrás</button></a>
 </body>
 </html>

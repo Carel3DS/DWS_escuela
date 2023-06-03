@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>departamento</title>
+</head>
+
+<body>
+    <img src="/logo.png" style="height: 80px" alt="logotipo">
+
+    <h1>{{department.name}}</h1>
+
+    <p><b>Ubicación: </b>{{department.location}}</p>
+    <h4>Profesores</h4>
+        <ul>
+            {{#teacher}}
+            <li><a href="/teacher/{{id}}">{{name}} {{Surname}}</a></li>
+            {{/teacher}}
+        </ul>
+    <h4>Descripción</h4>
+    <p style="border: solid 2px; width: 300px; height: 100px">{{{department.description}}}</p>
+    <a href="/department/edit?id={{department.id}}"><button>Editar departamento</button></a>
+    <a href="/"><button>Atrás</button></a><br><br>
+    <a href="/department/delete?id={{department.id}}" style="color: red;" >Eliminar departamento</a>
+
+</body>
+</html>

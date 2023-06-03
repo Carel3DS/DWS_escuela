@@ -7,8 +7,6 @@ import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -81,12 +79,36 @@ public class WebController {
         model.addAttribute("gradeexists", !grades.isEmpty());
         return "grades";
     }
-    @GetMapping("/profile/{id}")
-    public String getProfile(Model model, @PathVariable String id){
+    @GetMapping("/teacher/{id}")
+    public String getTeacherProfile(Model model, @PathVariable String id){
         Teacher teacher = teacherService.read(id);
         if(teacher != null){
             model.addAttribute("teacher",teacher);
-            return "profile";
+            model.addAttribute("grades",teacher.getGrades());
+            return "teacherProfile";
+        }else{
+            return "/";
+        }
+    }
+
+    @GetMapping("/grade/{id}")
+    public String getGradeProfile(Model model, @PathVariable Long id){
+        Grade grade = gradeService.read(id);
+        if(grade != null){
+            model.addAttribute("grade",grade);
+            model.addAttribute("teacher",grade.getTeachers());
+            return "gradeProfile";
+        }else{
+            return "/";
+        }
+    }
+    @GetMapping("/department/{id}")
+    public String getDepartmentProfile(Model model, @PathVariable Long id){
+        Department department = departmentService.read(id);
+        if(department != null){
+            model.addAttribute("department",department);
+            model.addAttribute("teacher",department.getTeachers());
+            return "departmentProfile";
         }else{
             return "/";
         }
@@ -124,11 +146,11 @@ public class WebController {
     @PostMapping("/grade/add")
     public String postGrade(Model model, @RequestParam String name, @RequestParam Integer year, @RequestParam String description){
         gradeService.create(new Grade(name,description,year));
-        return "grades";
+        return getGrades(model);
     }
 
     //Edit controllers
-    @GetMapping("/profile/edit")
+    @GetMapping("/teacher/edit")
     public String editTeacher(Model model, @RequestParam String id){
         Teacher teacher = teacherService.read(id);
         if(teacher != null){
@@ -138,10 +160,10 @@ public class WebController {
             return "/";
         }
     }
-    @PostMapping("/profile/edit")
+    @PostMapping("/teacher/edit")
     public String putEditTeacher(Model model, @RequestParam String id, @RequestParam String pass, @RequestParam String description, @RequestParam int age){
         if(teacherService.update(id,new Teacher("","",pass,description,age)) != null){
-            return getProfile(model,id);
+            return getTeacherProfile(model,id);
         }else {
             return "/";
         }
@@ -161,7 +183,7 @@ public class WebController {
     @PostMapping("/grade/edit")
     public String putEditGrade(Model model, @RequestParam Long id, @RequestParam String name, @RequestParam String description, @RequestParam int year){
         if(gradeService.update(id,new Grade(name,description,year)) != null){
-            return getGrades(model);
+            return getGradeProfile(model,id);
         }else {
             return "/";
         }
@@ -181,14 +203,14 @@ public class WebController {
     @PostMapping("/department/edit")
     public String putEditDepartment(Model model, @RequestParam Long id, @RequestParam String name, @RequestParam String location, @RequestParam String description){
         if(departmentService.update(id,new Department(name,location,description)) != null){
-            return getDepartments(model);
+            return getDepartmentProfile(model,id);
         }else {
             return "/";
         }
     }
 
     //Delete controllers
-    @GetMapping("/profile/delete")
+    @GetMapping("/teacher/delete")
     public String deleteTeacher(Model model, @RequestParam String id){
         if(teacherService.read(id) != null){
             teacherService.delete(id);
@@ -220,7 +242,7 @@ public class WebController {
     @GetMapping("/grade/remove")
     public String removeTeacherFromGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
         if(teacherService.removeGrade(teacherId,id) != null){
-            return getProfile(model,teacherId);
+            return getTeacherProfile(model,teacherId);
         }else{
             return "/";
         }
@@ -229,7 +251,7 @@ public class WebController {
     @GetMapping("/department/remove")
     public String removeTeacherFromDept(Model model, @RequestParam String teacherId){
         if(teacherService.removeDept(teacherId) != null){
-            return getProfile(model,teacherId);
+            return getTeacherProfile(model,teacherId);
         }else{
             return "/";
         }

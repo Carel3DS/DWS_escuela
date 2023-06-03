@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clase</title>
+</head>
+
+<body>
+    <img src="/logo.png" style="height: 80px" alt="logotipo">
+
+    <h1>{{grade.name}}</h1>
+
+    <p><b>Año: </b>{{grade.year}}</p>
+    <h4>Profesores</h4>
+        <ul>
+            {{#teacher}}
+            <li><a href="/teacher/{{id}}">{{name}} {{Surname}}</a></li>
+            {{/teacher}}
+        </ul>
+    <h4>Descripción</h4>
+    <p style="border: solid 2px; width: 300px; height: 100px">{{{grade.description}}}</p>
+    <a href="/department/edit?id={{grade.id}}"><button>Editar clase</button></a>
+    <a href="/"><button>Atrás</button></a><br><br>
+    <a href="/department/delete?id={{grade.id}}" style="color: red;" >Eliminar clase</a>
+
+</body>
+</html>
