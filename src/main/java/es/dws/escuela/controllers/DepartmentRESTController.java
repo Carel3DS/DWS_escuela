@@ -34,7 +34,7 @@ public class DepartmentRESTController {
 
     @GetMapping("/department/{id}")
     @JsonView(Views.Department.class)
-    public ResponseEntity<Department> get(@RequestParam Long id){
+    public ResponseEntity<Department> get(@PathVariable Long id){
         Department department = service.read(id);
         if (department != null){
             return new ResponseEntity<>(department, HttpStatus.OK);
@@ -45,7 +45,7 @@ public class DepartmentRESTController {
 
     @PutMapping("/department/{id}")
     @JsonView(Views.Department.class)
-    public ResponseEntity<Department> put(@RequestParam Long id, @RequestBody Department department){
+    public ResponseEntity<Department> put(@PathVariable Long id, @RequestBody Department department){
         Department newDepartment = service.update(id, department);
         if (newDepartment != null){
             return new ResponseEntity<>(newDepartment, HttpStatus.OK);
@@ -56,7 +56,7 @@ public class DepartmentRESTController {
 
     @DeleteMapping("/department/{id}")
     @JsonView(Views.Department.class)
-    public ResponseEntity<Department> delete(@RequestParam Long id){
+    public ResponseEntity<Department> delete(@PathVariable Long id){
         Department department = service.delete(id);
         if (department != null){
             return new ResponseEntity<>(department, HttpStatus.OK);

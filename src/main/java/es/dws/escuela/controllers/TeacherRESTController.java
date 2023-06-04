@@ -37,7 +37,7 @@ public class TeacherRESTController {
 
     @GetMapping("/teacher/{id}")
     @JsonView(Views.Teacher.class)
-    public ResponseEntity<Teacher> get(@RequestParam String id){
+    public ResponseEntity<Teacher> get(@PathVariable String id){
         Teacher teacher = service.read(id);
         if (teacher != null){
             return new ResponseEntity<>(teacher, HttpStatus.OK);
@@ -48,7 +48,7 @@ public class TeacherRESTController {
 
     @PutMapping("/teacher/{id}")
     @JsonView(Views.Teacher.class)
-    public ResponseEntity<Teacher> put(@RequestParam String id, @RequestBody Teacher teacher){
+    public ResponseEntity<Teacher> put(@PathVariable String id, @RequestBody Teacher teacher){
         Teacher newTeacher = service.update(id, teacher);
         if (newTeacher != null){
             return new ResponseEntity<>(newTeacher, HttpStatus.OK);
@@ -59,7 +59,7 @@ public class TeacherRESTController {
 
     @DeleteMapping("/teacher/{id}")
     @JsonView(Views.Teacher.class)
-    public ResponseEntity<Teacher> delete(@RequestParam String id){
+    public ResponseEntity<Teacher> delete(@PathVariable String id){
         Teacher teacher = service.delete(id);
         if (teacher != null){
             return new ResponseEntity<>(teacher, HttpStatus.OK);
