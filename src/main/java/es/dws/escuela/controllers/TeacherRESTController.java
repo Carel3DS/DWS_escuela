@@ -27,6 +27,8 @@ public class TeacherRESTController {
     @PostMapping("/teacher")
     @JsonView(Views.Teacher.class)
     public ResponseEntity<Teacher> post(@RequestBody Teacher teacher){
+        teacher.setId(teacher.getName().toLowerCase().replace(" ","")+"."+teacher.getSurname().toLowerCase());
+        teacher.setEmail(teacher.getId()+"@urdj.es");
         return new ResponseEntity<>(service.create(teacher),HttpStatus.CREATED);
     }
     @GetMapping("/teacher")

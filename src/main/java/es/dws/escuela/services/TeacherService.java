@@ -53,8 +53,12 @@ public class TeacherService {
             //TODO: make safe update (for each attribute)
             Teacher teacher = op.get();
             teacher.setDescription(newTeacher.getDescription());
-            teacher.setPassword(newTeacher.getPassword());
-            teacher.setAge(newTeacher.getAge());
+            if(newTeacher.getPassword().length() > 0 && !newTeacher.getPassword().equals(teacher.getPassword())){
+                teacher.setPassword(newTeacher.getPassword());
+            }
+            if(newTeacher.getAge() <= 100 && newTeacher.getAge() > 0){
+                teacher.setAge(newTeacher.getAge());
+            }
             repository.save(teacher);
             return teacher;
         }else{
