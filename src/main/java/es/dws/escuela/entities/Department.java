@@ -3,6 +3,8 @@ package es.dws.escuela.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,9 @@ public class Department {
     @JsonView({Views.Teacher.class,Views.Department.class})
     private Long id;
     @JsonView({Views.Teacher.class,Views.Department.class})
+    @Column(nullable = false)
+    @NotBlank(message = "A name is required")
+    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The Name cannot contain special characters")
     private String name;
     @JsonView(Views.Department.class)
     private String location;

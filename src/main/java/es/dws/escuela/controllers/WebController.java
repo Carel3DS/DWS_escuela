@@ -7,9 +7,13 @@ import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,8 +34,8 @@ public class WebController {
     public void init(){
         //Create some instances
         //E-Mail are generated automatically
-        Teacher teacher = new Teacher("Profesor","Uno","uno","Soy profesor 1",21);
-        Teacher teacher2 = new Teacher("Profesor","Dos","dos","Soy profesor 2",23);
+        Teacher teacher = new Teacher("Profesor","Uno","JDG*1NsKdf","Soy profesor 1",21);
+        Teacher teacher2 = new Teacher("Profesor","Dos","JDG*1NsKdf","Soy profesor 2",23);
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
         //Create the department into the database
@@ -132,22 +136,73 @@ public class WebController {
     }
 
     //Post controllers
-    @PostMapping("/teacher/add")
-    public String postTeacher(Model model, @RequestParam String name, @RequestParam String surname, @RequestParam String pass, @RequestParam String description, @RequestParam int    age){
-        //Only takes the first surname
+    /*@PostMapping("/teacher/add")
+    public String postTeacher(Model model,
+                              @RequestParam String name,
+                              @RequestParam String surname,
+                              @RequestParam String pass,
+                              @RequestParam String description,
+                              @RequestParam int age){
         teacherService.create(new Teacher(name,surname.split(" ")[0],pass,description,age));
         return getTeachers(model);
+    }*/
+    /*@PostMapping("/department/add")
+    public String postDepartment(Model model,
+                                 @RequestParam String name,
+                                 @RequestParam String location,
+                                 @RequestParam String description){
+        departmentService.create(new Department(name,location,description));
+        return getDepartments(model);
+    }*/
+    /*@PostMapping("/grade/add")
+    public String postGrade(Model model,
+                            @RequestParam String name,
+                            @RequestParam Integer year,
+                            @RequestParam String description){
+        gradeService.create(new Grade(name,description,year));
+        return getGrades(model);
+    }*/
+
+    //MODIFICATION: implements validation and body
+    //TODO: fix form validation error. Implement validation at editing
+    @PostMapping("/teacher/add")
+    public String postTeacher(Model model, @Valid Teacher teacher, BindingResult br){
+        if(br.hasErrors()){
+            for (FieldError e:br.getFieldErrors()){
+                model.addAttribute(e.getField(),e.getDefaultMessage());
+            }
+            model.addAttribute("ignore",1);
+            model.addAttribute("formerror",1);
+            return "teacherForm";
+        }
+        if(!teacherService.teacherExists(teacher.getId())){
+            teacherService.create(teacher);
+            return getTeachers(model);
+        }else {
+            ObjectError e = new ObjectError("ExistingTeacherError","Teacher with this name and surname already exists");
+            model.addAttribute("error",e);
+            return "error";
+        }
     }
     @PostMapping("/department/add")
-    public String postDepartment(Model model, @RequestParam String name, @RequestParam String location, @RequestParam String description){
-        departmentService.create(new Department(name,location,description));
+    public String postDepartment(Model model, @Valid Department department, BindingResult br){
+        if(br.hasErrors()){
+            model.addAttribute("error",br.getAllErrors());
+            return "error";
+        }
+        departmentService.create(department);
         return getDepartments(model);
     }
     @PostMapping("/grade/add")
-    public String postGrade(Model model, @RequestParam String name, @RequestParam Integer year, @RequestParam String description){
-        gradeService.create(new Grade(name,description,year));
+    public String postGrade(Model model, @Valid Grade grade, BindingResult br){
+        if(br.hasErrors()){
+            model.addAttribute("error",br.getAllErrors());
+            return "error";
+        }
+        gradeService.create(grade);
         return getGrades(model);
     }
+
 
     //Edit controllers
     @GetMapping("/teacher/edit")
@@ -161,7 +216,11 @@ public class WebController {
         }
     }
     @PostMapping("/teacher/edit")
-    public String putEditTeacher(Model model, @RequestParam String id, @RequestParam String pass, @RequestParam String description, @RequestParam int age){
+    public String putEditTeacher(Model model,
+                                 @RequestParam String id,
+                                 @RequestParam String pass,
+                                 @RequestParam String description,
+                                 @RequestParam int age){
         if(teacherService.update(id,new Teacher("","",pass,description,age)) != null){
             return getTeacherProfile(model,id);
         }else {
@@ -181,7 +240,11 @@ public class WebController {
         }
     }
     @PostMapping("/grade/edit")
-    public String putEditGrade(Model model, @RequestParam Long id, @RequestParam String name, @RequestParam String description, @RequestParam int year){
+    public String putEditGrade(Model model,
+                               @RequestParam Long id,
+                               @RequestParam String name,
+                               @RequestParam String description,
+                               @RequestParam int year){
         if(gradeService.update(id,new Grade(name,description,year)) != null){
             return getGradeProfile(model,id);
         }else {

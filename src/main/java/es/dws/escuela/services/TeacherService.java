@@ -53,8 +53,8 @@ public class TeacherService {
             //TODO: make safe update (for each attribute)
             Teacher teacher = op.get();
             teacher.setDescription(newTeacher.getDescription());
-            if(newTeacher.getPassword().length() > 0 && !newTeacher.getPassword().equals(teacher.getPassword())){
-                teacher.setPassword(newTeacher.getPassword());
+            if(newTeacher.getPass().length() > 0 && !newTeacher.getPass().equals(teacher.getPass())){
+                teacher.setPass(newTeacher.getPass());
             }
             if(newTeacher.getAge() <= 100 && newTeacher.getAge() > 0){
                 teacher.setAge(newTeacher.getAge());
@@ -83,6 +83,10 @@ public class TeacherService {
 
     //Non-standard queries
 
+    //Check if teacher exists
+    public boolean teacherExists(String id){
+        return repository.findById(id).isPresent();
+    }
     //Assign teacher to department
     public Teacher assignDept(String teacherId, Long deptId){
         Teacher teacher = this.read(teacherId);
