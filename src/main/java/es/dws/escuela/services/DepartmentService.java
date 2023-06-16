@@ -3,6 +3,7 @@ package es.dws.escuela.services;
 import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.DepartmentRepository;
+import es.dws.escuela.valids.ValidDept;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +27,16 @@ public class DepartmentService {
         return op.orElse(null);
     }
 
-    public Department update(Long id, Department newDepartment){
+    public Department update(Long id, ValidDept newDepartment){
         Optional<Department> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             Department department = op.get();
+            if(newDepartment.getName() != null){
+                department.setName(newDepartment.getName());
+            }
+            //Location and Description can be Null
             department.setLocation(newDepartment.getLocation());
-            department.setName(newDepartment.getName());
             department.setDescription(newDepartment.getDescription());
             //Does this overwrite the department identified by id?
             repository.save(department);

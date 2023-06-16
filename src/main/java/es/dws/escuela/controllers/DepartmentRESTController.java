@@ -5,6 +5,8 @@ import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.TeacherService;
+import es.dws.escuela.valids.ValidDept;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +47,8 @@ public class DepartmentRESTController {
 
     @PutMapping("/department/{id}")
     @JsonView(Views.Department.class)
-    public ResponseEntity<Department> put(@PathVariable Long id, @RequestBody Department department){
-        Department newDepartment = service.update(id, department);
+    public ResponseEntity<Department> put(@PathVariable Long id, @RequestBody @Valid ValidDept newDept){
+        Department newDepartment = service.update(id, newDept);
         if (newDepartment != null){
             return new ResponseEntity<>(newDepartment, HttpStatus.OK);
         }else{

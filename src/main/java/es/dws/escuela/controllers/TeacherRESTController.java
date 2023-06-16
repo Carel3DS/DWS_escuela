@@ -6,6 +6,8 @@ import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
+import es.dws.escuela.valids.ValidTeacher;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +52,7 @@ public class TeacherRESTController {
 
     @PutMapping("/teacher/{id}")
     @JsonView(Views.Teacher.class)
-    public ResponseEntity<Teacher> put(@PathVariable String id, @RequestBody Teacher teacher){
+    public ResponseEntity<Teacher> put(@PathVariable String id, @RequestBody @Valid ValidTeacher teacher){
         Teacher newTeacher = service.update(id, teacher);
         if (newTeacher != null){
             return new ResponseEntity<>(newTeacher, HttpStatus.OK);

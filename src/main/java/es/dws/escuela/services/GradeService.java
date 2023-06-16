@@ -5,6 +5,7 @@ import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.GradeRepository;
+import es.dws.escuela.valids.ValidGrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +28,17 @@ public class GradeService {
         return op.orElse(null);
     }
 
-    public Grade update(Long id, Grade newGrade){
+    public Grade update(Long id, ValidGrade newGrade){
         Optional<Grade> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             Grade grade = op.get();
-            grade.setYear(newGrade.getYear());
-            grade.setName(newGrade.getName());
+            if(newGrade.getYear() != null){
+                grade.setYear(newGrade.getYear());
+            }
+            if(newGrade.getName() != null){
+                grade.setName(newGrade.getName());
+            }
             grade.setDescription(newGrade.getDescription());
             //Does this overwrite the grade identified by id?
             repository.save(grade);

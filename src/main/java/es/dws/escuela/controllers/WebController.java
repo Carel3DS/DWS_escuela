@@ -6,6 +6,9 @@ import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
+import es.dws.escuela.valids.ValidDept;
+import es.dws.escuela.valids.ValidGrade;
+import es.dws.escuela.valids.ValidTeacher;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,12 +219,8 @@ public class WebController {
         }
     }
     @PostMapping("/teacher/edit")
-    public String putEditTeacher(Model model,
-                                 @RequestParam String id,
-                                 @RequestParam String pass,
-                                 @RequestParam String description,
-                                 @RequestParam int age){
-        if(teacherService.update(id,new Teacher("","",pass,description,age)) != null){
+    public String putEditTeacher(Model model, @RequestParam String id, @Valid ValidTeacher newTeacher){
+        if(teacherService.update(id,newTeacher) != null){
             return getTeacherProfile(model,id);
         }else {
             return "/";
@@ -240,12 +239,8 @@ public class WebController {
         }
     }
     @PostMapping("/grade/edit")
-    public String putEditGrade(Model model,
-                               @RequestParam Long id,
-                               @RequestParam String name,
-                               @RequestParam String description,
-                               @RequestParam int year){
-        if(gradeService.update(id,new Grade(name,description,year)) != null){
+    public String putEditGrade(Model model, @RequestParam Long id, @Valid ValidGrade newGrade){
+        if(gradeService.update(id,newGrade) != null){
             return getGradeProfile(model,id);
         }else {
             return "/";
@@ -264,8 +259,8 @@ public class WebController {
         }
     }
     @PostMapping("/department/edit")
-    public String putEditDepartment(Model model, @RequestParam Long id, @RequestParam String name, @RequestParam String location, @RequestParam String description){
-        if(departmentService.update(id,new Department(name,location,description)) != null){
+    public String putEditDepartment(Model model, @RequestParam Long id, @Valid ValidDept newDept){
+        if(departmentService.update(id,newDept) != null){
             return getDepartmentProfile(model,id);
         }else {
             return "/";

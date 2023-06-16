@@ -4,6 +4,7 @@ import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.TeacherRepository;
+import es.dws.escuela.valids.ValidTeacher;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class TeacherService {
         return op.orElse(null);
     }
 
-    public Teacher update(String id, Teacher newTeacher){
+    public Teacher update(String id, ValidTeacher newTeacher){
         Optional<Teacher> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
@@ -56,7 +57,7 @@ public class TeacherService {
             if(newTeacher.getPass().length() > 0 && !newTeacher.getPass().equals(teacher.getPass())){
                 teacher.setPass(newTeacher.getPass());
             }
-            if(newTeacher.getAge() <= 100 && newTeacher.getAge() > 0){
+            if(newTeacher.getAge() != null){
                 teacher.setAge(newTeacher.getAge());
             }
             repository.save(teacher);
@@ -185,4 +186,5 @@ public class TeacherService {
             return null;
         }
     }
+
 }
