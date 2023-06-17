@@ -22,7 +22,7 @@ public class ValidTeacher {
     private Integer age;
 
     //Make the password at least secure
-    @Pattern(regexp = "^(?=.+[a-z])(?=.+[A-Z])(?=.+[0-9])(?=.*[@#$*%^&+=?!]).{8,16}$",
+    @Pattern(regexp = "|^(?=.+[a-z])(?=.+[A-Z])(?=.+[0-9])(?=.*[@#$*%^&+=?!]).{8,16}$",
             message = """
                     Password must have at least 8 characters, including:<ul>
                     <li>one uppercase letter</li>

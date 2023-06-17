@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Crear Departamento</title>
+    <link rel="stylesheet" href="/css/richtext.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.richtext.js"></script>
+
 </head>
 <body>
-    <img src="/logo.png" style="height: 80px" alt="logotipo">
+    <img src="/img/logo.png" style="height: 80px" alt="logotipo">
     <h1>{{#ignore}}Crear departamento{{/ignore}}{{^ignore}}Editar departamento{{/ignore}}</h1>
 
     <form action="{{#ignore}}/department/add{{/ignore}}{{^ignore}}/department/edit?id={{department.id}}{{/ignore}}" method="post">
@@ -13,12 +18,20 @@
         <input id="name" {{^ignore}}value="{{department.name}}"{{/ignore}} name="name"><br>
         <label for="location">Ubicación</label><br>
         <input id="location" {{^ignore}}value="{{department.location}}"{{/ignore}} name="location"><br>
-        <label for="description">Descripción</label><br>
-        <textarea id="description" name="description">{{#ignore}}Esto es un nuevo departamento{{/ignore}}{{^ignore}}{{department.description}}{{/ignore}}</textarea>
-
+        <label for="richtext">Descripción</label><br>
+        <div style="width: 600px">
+            <input type="text" id="richtext" name="description">{{#ignore}}Esto es un nuevo departamento{{/ignore}}{{^ignore}}{{department.description}}{{/ignore}}
+            <script>
+                $(document).ready(function (){
+                    $('#richtext').richText();
+                });
+            </script>
+        </div>
         <br><input type="submit"><br>
     </form>
 
     <br><br><a href="/"><button>Atrás</button></a>
+
+
 </body>
 </html>

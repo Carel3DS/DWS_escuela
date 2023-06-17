@@ -5,10 +5,10 @@
     <title>Crear Profesor</title>
 </head>
 <body>
-    <img src="/logo.png" style="height: 80px" alt="logotipo">
+    <img src="/img/logo.png" style="height: 80px" alt="logotipo">
     <h1>{{#ignore}}Crear Profesor{{/ignore}}{{^ignore}}Editar perfil{{/ignore}}</h1>
     <p><b>Nota:</b> la cuenta de correo se genera automáticamente</p>
-    <form action="{{#ignore}}/teacher/add{{/ignore}}{{^ignore}}/profile/edit?id={{teacher.id}}{{/ignore}}" method="post">
+    <form action="{{#ignore}}/teacher/add{{/ignore}}{{^ignore}}/teacher/edit?id={{teacher.id}}{{/ignore}}" method="post">
         {{#ignore}}
         <label for="name">Nombre</label><br>
         <input id="name"  name="name"><br>

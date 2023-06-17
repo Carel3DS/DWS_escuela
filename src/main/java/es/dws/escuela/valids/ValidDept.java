@@ -11,16 +11,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 //The following class is used only for EDIT forms (hence, values can be null)
 public class ValidDept {
 
-    @Column(nullable = false)
-    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The Name cannot contain special characters")
+    @NotBlank(message = "A name is required")
+    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The name cannot contain special characters")
     private String name;
 
-    @Pattern(regexp = "^[a-zA-Z0-9.,\\s]*$", message = "The Location cannot contain special characters")
+    @Pattern(regexp = "^[a-zA-Z0-9.,\\s]*$", message = "The location cannot contain special characters")
     private String location;
 
     private String description;

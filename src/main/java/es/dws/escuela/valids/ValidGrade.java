@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class ValidGrade {
 
     @NotBlank(message = "A name is required")
-    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The name cannot contain special characters")
+    @Pattern(regexp = "|^[a-zA-Z0-9.\\s]*$", message = "The name cannot contain special characters")
     private String name;
 
     private String description;
