@@ -54,12 +54,25 @@ public class WebController {
         gradeService.create(grade);
 
     }
+    //Components (for Thymeleaf)
+    @GetMapping("/navbar")
+    public String navbar(){
+        return "components/navbar";
+    }
+    @GetMapping("/footer")
+    public String footer(){
+        return "components/footer";
+    }
+    @GetMapping("/")
+    public String index(){
+        return "home/index";
+    }
     //Get all the teachers. There is always at least one teacher, so teacherexists=1
     @GetMapping("/teacher")
     public String getTeachers(Model model){
         model.addAttribute("teachers",teacherService.readAll());
         model.addAttribute("teacherexists",1);
-        return "teachers";
+        return "entities/teachers";
     }
     @GetMapping("/teacherByAge")
     public String getTeachersByAge(Model model, @RequestParam(defaultValue = "1") int min, @RequestParam(defaultValue = "100") int max){
@@ -67,9 +80,9 @@ public class WebController {
             List<Teacher> teachers = teacherService.readByAge(min,max);
             model.addAttribute("teachers", teachers);
             model.addAttribute("teacherexists",!teachers.isEmpty());
-            return "teachers";
+            return "entities/teachers";
         }else{
-            return "/";
+            return "errors/error";
         }
     }
     @GetMapping("/department")
@@ -77,14 +90,14 @@ public class WebController {
         List<Department> departments = departmentService.readAll();
         model.addAttribute("department",departments);
         model.addAttribute("departmentexists", !departments.isEmpty());
-        return "departments";
+        return "entities/departments";
     }
     @GetMapping("/grade")
     public String getGrades(Model model){
         List<Grade> grades = gradeService.readAll();
         model.addAttribute("grade",grades);
         model.addAttribute("gradeexists", !grades.isEmpty());
-        return "grades";
+        return "entities/grades";
     }
     @GetMapping("/teacher/{id}")
     public String getTeacherProfile(Model model, @PathVariable String id){
@@ -92,9 +105,9 @@ public class WebController {
         if(teacher != null){
             model.addAttribute("teacher",teacher);
             model.addAttribute("grades",teacher.getGrades());
-            return "teacherProfile";
+            return "entities/profile";
         }else{
-            return "/";
+            return "errors/404";
         }
     }
 
@@ -104,9 +117,9 @@ public class WebController {
         if(grade != null){
             model.addAttribute("grade",grade);
             model.addAttribute("teacher",grade.getTeachers());
-            return "gradeProfile";
+            return "entities/gradeProfile";
         }else{
-            return "/";
+            return "errors/errors/404";
         }
     }
     @GetMapping("/department/{id}")
@@ -115,9 +128,9 @@ public class WebController {
         if(department != null){
             model.addAttribute("department",department);
             model.addAttribute("teacher",department.getTeachers());
-            return "departmentProfile";
+            return "entities/departmentProfile";
         }else{
-            return "/";
+            return "errors/404";
         }
     }
 
@@ -125,17 +138,17 @@ public class WebController {
     @GetMapping("/teacher/add")
     public String getTeacherForm(Model model){
         model.addAttribute("ignore",1);
-        return "teacherForm";
+        return "forms/teacherForm";
     }
     @GetMapping("/department/add")
     public String getDepartmentForm(Model model){
         model.addAttribute("ignore",1);
-        return "departmentForm";
+        return "forms/departmentForm";
     }
     @GetMapping("/grade/add")
     public String getGradeForm(Model model){
         model.addAttribute("ignore",1);
-        return "gradeForm";
+        return "forms/gradeForm";
     }
 
     //Post controllers
@@ -167,7 +180,6 @@ public class WebController {
     }*/
 
     //MODIFICATION: implements validation and body
-    //TODO: fix form validation error. Implement validation at editing
     @PostMapping("/teacher/add")
     public String postTeacher(Model model, @Valid Teacher teacher, BindingResult br){
         if(br.hasErrors()){
@@ -176,7 +188,7 @@ public class WebController {
             }
             model.addAttribute("ignore",1);
             model.addAttribute("formerror",1);
-            return "teacherForm";
+            return "forms/teacherForm";
         }
         if(!teacherService.teacherExists(teacher.getId())){
             teacherService.create(teacher);
@@ -184,7 +196,7 @@ public class WebController {
         }else {
             ObjectError e = new ObjectError("ExistingTeacherError","Teacher with this name and surname already exists");
             model.addAttribute("error",e);
-            return "error";
+            return "errors/error";
         }
     }
     @PostMapping("/department/add")
@@ -213,9 +225,9 @@ public class WebController {
         Teacher teacher = teacherService.read(id);
         if(teacher != null){
             model.addAttribute("teacher",teacher);
-            return "teacherForm";
+            return "forms/teacherForm";
         }else{
-            return "/";
+            return "errors/404";
         }
     }
     @PostMapping("/teacher/edit")
@@ -223,7 +235,7 @@ public class WebController {
         if(teacherService.update(id,newTeacher) != null){
             return getTeacherProfile(model,id);
         }else {
-            return "/";
+            return "errors/404";
         }
     }
     //TODO: (DONE) implement edit controllers for Grade and Department
@@ -235,7 +247,7 @@ public class WebController {
             model.addAttribute("grade",grade);
             return "gradeForm";
         }else{
-            return "/";
+            return "errors/404";
         }
     }
     @PostMapping("/grade/edit")
@@ -243,7 +255,7 @@ public class WebController {
         if(gradeService.update(id,newGrade) != null){
             return getGradeProfile(model,id);
         }else {
-            return "/";
+            return "errors/404";
         }
     }
 
@@ -253,9 +265,9 @@ public class WebController {
         Department department = departmentService.read(id);
         if(department != null){
             model.addAttribute("department",department);
-            return "departmentForm";
+            return "forms/departmentForm";
         }else{
-            return "/";
+            return "errors/404";
         }
     }
     @PostMapping("/department/edit")
@@ -263,7 +275,7 @@ public class WebController {
         if(departmentService.update(id,newDept) != null){
             return getDepartmentProfile(model,id);
         }else {
-            return "/";
+            return "errors/404";
         }
     }
 
@@ -274,7 +286,7 @@ public class WebController {
             teacherService.delete(id);
             return getTeachers(model);
         }else{
-            return "/";
+            return "errors/404";
         }
     }
     @GetMapping("/department/delete")
@@ -283,7 +295,7 @@ public class WebController {
             departmentService.delete(id);
             return getDepartments(model);
         }else{
-            return "/";
+            return "errors/404";
         }
     }
     @GetMapping("/grade/delete")
@@ -292,7 +304,7 @@ public class WebController {
             gradeService.delete(id);
             return getGrades(model);
         }else{
-            return "/";
+            return "errors/404";
         }
     }
 
@@ -302,7 +314,7 @@ public class WebController {
         if(teacherService.removeGrade(teacherId,id) != null){
             return getTeacherProfile(model,teacherId);
         }else{
-            return "/";
+            return "errors/404";
         }
     }
 
@@ -311,7 +323,7 @@ public class WebController {
         if(teacherService.removeDept(teacherId) != null){
             return getTeacherProfile(model,teacherId);
         }else{
-            return "/";
+            return "errors/404";
         }
     }
 

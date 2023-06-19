@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Features - URDJ</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comic+Neue&amp;display=swap">
+    <link rel="stylesheet" href="/assets/css/comicsans.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body><div th:insert="~{/components/navbar}"></div>
+    <section xmlns:th="http://www.thymeleaf.org">
+        <div class="container">
+            <div class="row">
+                <div class="col col-md-5 col-12 py-3">
+                    <div class="sticky-top">
+                        <div class="card bg-primary">
+                            <div class="card-body" style="padding: 20px 10%;">
+                                <h4 class="card-title fw-bold text-light"></h4>
+                                <h4 class="card-title fw-bold text-light">Ubicación</h4>
+                                <p class="card-title fw-bold text-light"><em><span style="font-weight: normal !important;">{{location}}</span></em></p>
+                                <h4 class="card-title fw-bold text-light">Profesores</h4>
+                                <ul class="list-group select">
+                                    <li class="list-group-item clickable"><span>List Group Item 1</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col py-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title fw-bold"><em><span style="font-weight: normal !important;">Perteneces a este departamento</span></em></h6>
+                            <h4 class="card-title fw-bold">Descripción</h4><div style="min-height: 160px;">
+{{{description}}}
+</div>
+                            <div class="float-end">
+                                <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title">Cómo cambiar de departamento</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Para cambiar de departamento tienes que hacer lo siguiente:</p>
+                                                <ul>
+                                                    <li>Ir a tu perfil y configuración</li>
+                                                    <li>En "Departamento", selecciona este departamento</li>
+                                                    <li>Guarda los cambios</li>
+                                                </ul>
+                                                <p>No se puede cambiar de dpto. directamente desde esta página</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><button class="btn btn-link btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#modal-1">Cómo cambiar dpto.</button><a class="btn btn-sm btn-primary" href="/department/edit?id={{id}}" style="margin-right: 5px;">Editar</a><a class="btn btn-sm btn-danger" href="/department/delete?id={{id}}">Eliminar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section><div th:insert="~{//components/footer}"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/startup-modern.js"></script>
+</body>
+
+</html>

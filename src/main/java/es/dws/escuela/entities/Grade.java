@@ -39,6 +39,7 @@ public class Grade {
     @JsonView(Views.Grade.class)
     private List<Teacher> teachers;
 
+
     public Grade(String name, String description, Integer year) {
         this.name = name;
         this.description = description;
