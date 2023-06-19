@@ -1,0 +1,90 @@
+p, a, h1, h2, h3, h4, h5, h6, button, .btn, td, thead, label, span {
+  font-family: 'Comic Neue',sans-serif;
+  font-weight: bolder;
+}
+
+.btn-primary, .btn-secondary, .btn-danger {
+  border-radius: 6px;
+}
+
+.card {
+  border-radius: 6px;
+  border-width: 2px;
+}
+
+.card-select:hover {
+  background: #0000000d;
+  transition-duration: 0.1s;
+}
+
+.card-select:active {
+  background: #12164345;
+  transition-duration: 0.1s;
+}
+
+.clickable:active {
+  background: #12164345;
+  transition-duration: 0.1s;
+}
+
+.clickable {
+  text-decoration: underline;
+}
+
+.clickable:hover {
+  color: var(--bs-blue);
+  transition-duration: 0.1s;
+}
+
+.clickable:active {
+  color: var(--bs-form-invalid-border-color);
+  transition-duration: 0.1s;
+}
+
+.clickable-icon:hover {
+  color: var(--bs-blue);
+}
+
+.clickable-icon:active {
+  color: var(--bs-form-invalid-border-color);
+  transition-duration: 0.1s;
+}
+
+.table-hover > tbody > tr > td:hover {
+  background: var(--bs-border-color-translucent);
+  /*transition-duration: 0.05s;*/
+}
+
+.table-hover {
+  /*transition-duration: 0.1s;*/
+}
+
+.form-range {
+  overflow: hidden;
+}
+
+.sticky-top {
+  top: 94px;
+}
+
+.list-group-item {
+  height: 50px;
+}
+
+.nav-link {
+  font-size: large;
+}
+
+#details {
+  width: 0;
+  visibility: hidden;
+}
+
+.list-group-item:hover {
+  background: var(--bs-secondary-bg);
+}
+
+li {
+  font-family: 'Comic Neue';
+}
+
