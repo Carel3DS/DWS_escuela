@@ -4,9 +4,12 @@ import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.TeacherRepository;
+import es.dws.escuela.utils.HTMLPolicy;
 import es.dws.escuela.valids.ValidTeacher;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,8 @@ public class TeacherService {
     private DepartmentService departmentService;
 
     public Teacher create(Teacher teacher){
+        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;;
+        teacher.setDescription(policy.sanitize(teacher.getDescription()));
         return repository.save(teacher);
     }
 

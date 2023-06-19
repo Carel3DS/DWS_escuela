@@ -4,9 +4,13 @@ import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.User;
 import es.dws.escuela.repositories.UserRepository;
+import es.dws.escuela.utils.HTMLPolicy;
 import es.dws.escuela.valids.ValidUser;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
+import org.owasp.html.examples.SlashdotPolicyExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +31,8 @@ public class UserService {
     private DepartmentService departmentService;
 
     public User create(User user){
+        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;;
+        user.setDescription(policy.sanitize(user.getDescription()));
         return repository.save(user);
     }
 

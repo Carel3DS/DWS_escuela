@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="light" lang="es">
+<html data-bs-theme="light" lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
@@ -14,7 +14,7 @@
 
 <body><div th:insert="~{/components/navbar}"></div>
     <section class="mt-5 text-center" style="padding-top: 100px;">
-        <h1 class="fw-bold display-3 mb-5">{{name}}</h1>
+        <h1 class="fw-bold display-3 mb-5" th:text="${grade.name}"></h1>
     </section>
     <section xmlns:th="http://www.thymeleaf.org">
         <div class="container">
@@ -25,7 +25,7 @@
                             <h4 class="card-title fw-bold text-light"></h4>
                             <h4 class="card-title fw-bold text-light">Profesores</h4>
                             <ul class="list-group select">
-                                <li class="list-group-item clickable" onclick="/teacher/{{teacher.id}}"><span>{{teacher.name}} {{teacher.surname}}</span></li>
+                                <li class="list-group-item clickable" th:each="teacher: ${grade.teachers}" th:attr="onclick=|window.location='/teacher/${teacher.id}'|" ><span th:text="|${teacher.name} ${teacher.surname}|"></span></li>
                             </ul>
                         </div>
                     </div>
@@ -35,9 +35,8 @@
                         <div class="card-body">
                             <h6 class="card-title fw-bold"><em><span style="font-weight: normal !important;">Apuntado</span></em></h6>
                             <h4 class="card-title fw-bold">Descripción</h4>
-                            <p class="card-title fw-bold">Año: {{year}}</p><div style="min-height: 160px;">
-{{{description}}}
-</div>
+                            <p class="card-title fw-bold" th:text="|Año: ${grade.year}|"></p>
+                            <div style="min-height: 160px;" th:utext="${grade.description}"></div>
                             <div class="float-end"><a class="btn btn-sm btn-secondary" href="/grade/join?id={{id}}" style="margin-right: 5px;">Apuntarse</a><a class="btn btn-sm btn-primary" href="/grade/edit?id={{id}}" style="margin-right: 5px;">Editar</a><a class="btn btn-sm btn-danger" href="/grade/delete?id={{id}}">Eliminar</a></div>
                         </div>
                     </div>

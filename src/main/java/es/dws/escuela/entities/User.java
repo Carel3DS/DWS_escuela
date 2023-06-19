@@ -20,25 +20,25 @@ import java.util.List;
 @Table(name = "users")
 public class User {
     @Id
-    @JsonView({Views.Teacher.class, Views.Department.class, Views.Grade.class})
+    @JsonView({Views.User.class, Views.Department.class, Views.Grade.class})
     //Identifier = name.surname, all lowercase without spaces
     private String id;
 
     //Email is generated automatically, and unique
     @Column(unique = true)
-    @JsonView(Views.Teacher.class)
+    @JsonView(Views.User.class)
     private String email;
 
     //Define each attribute, applying the necessary restrictions
     @Column(nullable = false)
-    @JsonView(Views.Teacher.class)
+    @JsonView(Views.User.class)
     @NotBlank(message = "Name is required")
     @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
     private String name;
 
     //Both name and surname have only latin characters
     @Column(nullable = false)
-    @JsonView(Views.Teacher.class)
+    @JsonView(Views.User.class)
     @NotBlank(message = "Surname is required")
     @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
     private String surname;
@@ -52,11 +52,11 @@ public class User {
     @NotBlank(message = "Password is required")
 
     private String pass;
-    @JsonView(Views.Teacher.class)
+    @JsonView(Views.User.class)
     private String description;
 
     //Relationship
-    @JsonView(Views.Teacher.class)
+    @JsonView(Views.User.class)
     @ManyToMany(mappedBy = "users")
     private List<Grade> grades;
 

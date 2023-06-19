@@ -25,10 +25,10 @@
                             <h4 class="card-title fw-bold">Filtros</h4>
                             <h5>Edad</h5><label class="form-label">Mínimo</label>
                             <div></div>
-                            <form>
-                                <div class="d-inline-flex"><input class="form-range form-control border-0" type="range" id="min" min="1" max="100" step="1" style="margin-bottom: 10px;max-width: 150px;margin-right: 12px;" oninput="this.nextElementSibling.value = this.value" value="1" onclick=""><output id="out_min">1</output></div>
+                            <form action="/teacherByAge">
+                                <div class="d-inline-flex"><input class="form-range form-control border-0" type="range" id="min" name="min" min="1" max="100" step="1" style="margin-bottom: 10px;max-width: 150px;margin-right: 12px;" oninput="this.nextElementSibling.value = this.value" value="1" onclick=""><output id="out_min">1</output></div>
                                 <div><label class="form-label">Máximo</label></div>
-                                <div class="d-inline-flex"><input class="form-range form-control border-0" type="range" id="max" min="1" max="100" step="1" style="margin-bottom: 10px;max-width: 150px;margin-right: 12px;" oninput="this.nextElementSibling.value = this.value" value="1"><output>1</output></div>
+                                <div class="d-inline-flex"><input class="form-range form-control border-0" type="range" id="max" name="max" min="1" max="100" step="1" style="margin-bottom: 10px;max-width: 150px;margin-right: 12px;" oninput="this.nextElementSibling.value = this.value" value="100"><output id="out_max">100</output></div>
                                 <div></div><button class="btn btn-primary btn-sm" type="submit">Aplicar</button>
                             </form>
                         </div>
@@ -38,12 +38,12 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col col-sm-4 py-2">
+                                <div class="col col-sm-4 py-2" th:each="teacher:${teachers}">
                                     <div class="card text-center card-select">
-                                        <div class="card-body card-select" onclick="window.location=/teacher/{{id}}"><img class="rounded-circle" style="width: 100px;height: 100px;margin-bottom: 16px;" src="/assets/img/logos/placeholder.jpg">
-                                            <h4 class="card-title">{{name}}{{surname}}</h4>
-                                            <h6 class="text-muted card-subtitle mb-2">{{department}}</h6>
-                                            <h6 class="text-muted card-subtitle mb-2">Edad: {{age}}</h6>
+                                        <div class="card-body card-select" th:attr="onclick=|window.location='/teacher/${teacher.id}'|"><img class="rounded-circle" style="width: 100px;height: 100px;margin-bottom: 16px;" src="/assets/img/logos/placeholder.jpg">
+                                            <h4 class="card-title" th:text="${teacher.name}+' '+${teacher.surname}"></h4>
+                                            <h6 class="text-muted card-subtitle mb-2" th:text="${teacher.department.name}"></h6>
+                                            <h6 class="text-muted card-subtitle mb-2" th:text="'Edad: '+${teacher.age}"></h6>
                                         </div>
                                     </div>
                                 </div>

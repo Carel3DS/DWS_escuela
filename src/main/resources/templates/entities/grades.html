@@ -42,28 +42,15 @@
                                             <th class="a">Nombre</th>
                                             <th>Año</th>
                                             <th>Profesores</th>
-                                            <th style="width: 61px;"></th>
+                                            <th style="width: 61px;"> </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="clickable" onclick="window.location=/grade/{{id}}">
-                                                <div class="modal fade text-center" role="dialog" tabindex="-1" id="modal-2">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h4 class="modal-title">Modal Title</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p>The content of your modal.</p>
-                                                            </div>
-                                                            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button><button class="btn btn-primary" type="button">Save</button></div>
-                                                        </div>
-                                                    </div>
-                                                </div>{{name}}
+                                        <tr th:each="grade : ${grades}">
+                                            <td class="clickable" th:text="${grade.name}" th:attr="onclick=|window.location='/grade/'+${grade.id}|">
                                             </td>
-                                            <td>{{year}}</td>
-                                            <td><strong>{{#teachers}}{{teacher.name}}&lt;br&gt;{{/teachers}}</strong></td>
+                                            <td><strong th:text="${grade.year}"></strong></td>
+                                            <td><p th:each="teacher : ${grade.teachers}" style="margin: 1px;" th:text="${teacher.name}+' '+${teacher.surname}"></p></td>
                                             <td><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;">
 
                                                         <path d="M13.5858 3.58579C14.3668 2.80474 15.6332 2.80474 16.4142 3.58579C17.1953 4.36683 17.1953 5.63316 16.4142 6.41421L15.6213 7.20711L12.7929 4.37868L13.5858 3.58579Z" fill="currentColor"></path>

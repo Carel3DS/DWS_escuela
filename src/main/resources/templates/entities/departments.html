@@ -46,10 +46,10 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="clickable" onclick="window.location=/department/{{id}}">{{name}}</td>
-                                            <td>{{location}}</td>
-                                            <td>{{#teachers}}{{teacher.name}}&lt;br&gt;{{/teachers}}</td>
+                                        <tr th:each="department : ${departments}">
+                                            <td class="clickable"  th:text="${department.name}" th:attr="onclick=|window.location='/department/'+${department.id}|"></td>
+                                            <td th:text="${department.location}"></td>
+                                            <td><p th:each="teacher : ${department.teachers}" style="margin: 1px;" th:text="${teacher.name}+' '+${teacher.surname}"></p></td>
                                             <td><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;">
 
                                                         <path d="M13.5858 3.58579C14.3668 2.80474 15.6332 2.80474 16.4142 3.58579C17.1953 4.36683 17.1953 5.63316 16.4142 6.41421L15.6213 7.20711L12.7929 4.37868L13.5858 3.58579Z" fill="currentColor"></path>

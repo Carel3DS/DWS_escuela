@@ -16,8 +16,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+
 
 import java.security.SecureRandom;
+
+import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -37,12 +41,14 @@ public class SecurityConfiguration {
 
                 //Make public some entity views
                 authz.requestMatchers("/grade").permitAll();
-                //authz.requestMatchers("/grade/{id}").permitAll();
+                authz.requestMatchers(regexMatcher("/grade\\/\\d+")).permitAll();
                 authz.requestMatchers("/teacher").permitAll();
+                authz.requestMatchers(regexMatcher("/teacher\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
                 authz.requestMatchers("/teacher/add").permitAll();
                 authz.requestMatchers("/teacherByAge").permitAll();
                 authz.requestMatchers("/department").permitAll();
-                //authz.requestMatchers("/department/{id}").permitAll();
+                authz.requestMatchers(regexMatcher("/department\\/\\d+")).permitAll();
+
 
 
                 //Rest of requests are authenticated

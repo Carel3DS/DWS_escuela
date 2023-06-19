@@ -40,6 +40,7 @@ public class Grade {
     private List<Teacher> teachers;
 
     @ManyToMany
+    @JsonView(Views.Grade.class)
     private List<User> users;
 
 
@@ -48,6 +49,7 @@ public class Grade {
         this.description = description;
         this.year = year;
         this.teachers = new ArrayList<>();
+        this.users = new ArrayList<>();
     }
 
     public void addTeacher(Teacher teacher) {
@@ -75,5 +77,10 @@ public class Grade {
 
     public void removeUser(User user) {
         this.users.remove(user);
+    }
+
+    public void addUser(User user) {
+        this.users.add(user);
+        user.getGrades().add(this);
     }
 }

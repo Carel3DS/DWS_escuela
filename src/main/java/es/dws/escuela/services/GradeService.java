@@ -4,7 +4,13 @@ import es.dws.escuela.entities.*;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.repositories.GradeRepository;
+import es.dws.escuela.utils.HTMLPolicy;
 import es.dws.escuela.valids.ValidGrade;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
+import org.owasp.html.examples.EbayPolicyExample;
+import org.owasp.html.examples.SlashdotPolicyExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +23,8 @@ public class GradeService {
     private GradeRepository repository;
 
     public Grade create(Grade grade){
+        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
+        grade.setDescription(policy.sanitize(grade.getDescription()));
         return repository.save(grade);
     }
     public List<Grade> readAll(){

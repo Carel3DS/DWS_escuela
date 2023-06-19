@@ -3,6 +3,7 @@ package es.dws.escuela.controllers;
 import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Teacher;
+import es.dws.escuela.entities.User;
 import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
@@ -43,20 +44,23 @@ public class WebController {
     public void init(){
         //Create some instances
         //E-Mail are generated automatically
-        Teacher teacher = new Teacher("Profesor","Uno",passwordEncoder.encode("JDG*1NsKdf"),"Soy profesor 1",21);
-        Teacher teacher2 = new Teacher("Profesor","Dos",passwordEncoder.encode("JDG*1NsKdf"),"Soy profesor 2",23);
+        Teacher teacher1 = new Teacher("Profesor","Uno",passwordEncoder.encode("profesor1"),"Soy profesor 1",21);
+        Teacher teacher2 = new Teacher("Profesor","Dos",passwordEncoder.encode("profesor2"),"Soy profesor 2",23);
+        User user = new User("Fulano","Fulanito", passwordEncoder.encode("fulano"),"Hola mundo");
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
         //Create the department into the database
         department = departmentService.create(department);
         //Associate teachers with the department and create the teachers
-        teacher.setDepartment(department);
+        teacher1.setDepartment(department);
         teacher2.setDepartment(department);
-        teacherService.create(teacher);
+        teacherService.create(teacher1);
         teacherService.create(teacher2);
-        //Associate the grade to the teachers and create the grade
-        grade.addTeacher(teacher);
+        userService.create(user);
+        //Associate the grade to the teachers and the user and create the grade
+        grade.addTeacher(teacher1);
         grade.addTeacher(teacher2);
+        grade.addUser(user);
         gradeService.create(grade);
 
     }
@@ -78,7 +82,6 @@ public class WebController {
     @GetMapping("/teacher")
     public String getTeachers(Model model){
         model.addAttribute("teachers",teacherService.readAll());
-        model.addAttribute("teacherexists",1);
         return "entities/teachers";
     }
     @GetMapping("/teacherByAge")
@@ -86,7 +89,6 @@ public class WebController {
         if(min <= max && min > 0){
             List<Teacher> teachers = teacherService.readByAge(min,max);
             model.addAttribute("teachers", teachers);
-            model.addAttribute("teacherexists",!teachers.isEmpty());
             return "entities/teachers";
         }else{
             return "errors/error";
@@ -95,23 +97,20 @@ public class WebController {
     @GetMapping("/department")
     public String getDepartments(Model model){
         List<Department> departments = departmentService.readAll();
-        model.addAttribute("department",departments);
-        model.addAttribute("departmentexists", !departments.isEmpty());
+        model.addAttribute("departments",departments);
         return "entities/departments";
     }
     @GetMapping("/grade")
     public String getGrades(Model model){
         List<Grade> grades = gradeService.readAll();
-        model.addAttribute("grade",grades);
-        model.addAttribute("gradeexists", !grades.isEmpty());
+        model.addAttribute("grades",grades);
         return "entities/grades";
     }
     @GetMapping("/teacher/{id}")
     public String getTeacherProfile(Model model, @PathVariable String id){
         Teacher teacher = teacherService.read(id);
         if(teacher != null){
-            model.addAttribute("teacher",teacher);
-            model.addAttribute("grades",teacher.getGrades());
+            model.addAttribute("profile",teacher);
             return "entities/profile";
         }else{
             return "errors/404";

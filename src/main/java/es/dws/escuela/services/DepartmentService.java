@@ -3,7 +3,12 @@ package es.dws.escuela.services;
 import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.DepartmentRepository;
+import es.dws.escuela.utils.HTMLPolicy;
 import es.dws.escuela.valids.ValidDept;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
+import org.owasp.html.examples.SlashdotPolicyExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +22,8 @@ public class DepartmentService {
     private DepartmentRepository repository;
 
     public Department create(Department department){
+        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
+        department.setDescription(policy.sanitize(department.getDescription()));
         return repository.save(department);
     }
     public List<Department> readAll(){

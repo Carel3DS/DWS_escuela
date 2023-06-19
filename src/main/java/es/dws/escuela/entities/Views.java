@@ -4,6 +4,5 @@ public interface Views {
     public class Teacher{}
     public class Department{}
     public class Grade{}
-
     public class User{}
 }

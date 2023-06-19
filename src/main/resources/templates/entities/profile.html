@@ -21,20 +21,21 @@
                         <div class="card-body bg-primary" style="padding: 24px;border-radius: 12px;">
                             <div class="row text-center">
                                 <div class="col"><img class="rounded-circle border border-3" width="100" height="80" style="width: 100px;height: 100px;margin-bottom: 10px;" src="/assets/img/logos/placeholder.jpg">
-                                    <h3 class="text-center text-light">{{name}} {{surname}}</h3>
-                                    <h6 class="text-center text-light mb-2 text-info">{{role}}</h6>
+                                    <h3 class="text-center text-light" th:text="|${profile.name} ${profile.surname}|"></h3>
+                                    <h6 class="text-center text-light mb-2 text-info"></h6>
                                 </div>
                             </div>
                             <div class="row py-3">
-                                <div class="col"><div class="bg-white" style="padding-top: 12px;padding-right: 12px;padding-left: 12px;padding-bottom: 2px;min-height: 100px;border-radius: 6px;">
-    {{{description}}}
-</div></div>
+                                <div class="col">
+                                    <div class="bg-white" style="padding-top: 12px;padding-right: 12px;padding-left: 12px;padding-bottom: 2px;min-height: 100px;border-radius: 6px;" th:utext="${profile.description}">
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
-                                <div class="col text-center"><button class="btn btn-primary btn-secondary" type="button">Editar</button></div>
+                                <div class="col text-center"><button class="btn btn-primary btn-secondary" th:href="|/teacher/delete?id=${profile.id}|" type="button">Editar</button></div>
                             </div>
                             <div class="row text-center" style="margin-top: 10px;">
-                                <div class="col"><a class="text-light" href="#">Eliminar Cuenta</a></div>
+                                <div class="col"><a class="text-light" th:href="|/teacher/delete?id=${profile.id}|">Eliminar Cuenta</a></div>
                             </div>
                         </div>
                     </div>
@@ -50,7 +51,7 @@
                                             <p><strong>Departamento</strong></p>
                                         </div>
                                         <div class="col">
-                                            <p>{{department}}</p>
+                                            <p th:text="${profile.department.name}"></p>
                                         </div>
                                     </div>
                                 </li>
@@ -60,7 +61,7 @@
                                             <p><strong>Edad</strong></p>
                                         </div>
                                         <div class="col">
-                                            <p>{{age}}</p>
+                                            <p th:text="${profile.age}"></p>
                                         </div>
                                     </div>
                                 </li>
@@ -70,7 +71,7 @@
                                             <p><strong>Correo</strong></p>
                                         </div>
                                         <div class="col">
-                                            <p>{{email}}</p>
+                                            <p th:text="${profile.email}"></p>
                                         </div>
                                     </div>
                                 </li>
@@ -81,7 +82,7 @@
                         <div class="card-body">
                             <h4 class="card-title" style="padding-left: 13px;padding-bottom: 6px;">Clases</h4>
                             <ul class="list-group">
-                                <li class="list-group-item"><span>{{class.name}}</span></li>
+                                <li class="list-group-item" th:each="grade: ${profile.grades}"><span th:text="${grade.name}"></span></li>
                             </ul>
                         </div>
                     </div>
