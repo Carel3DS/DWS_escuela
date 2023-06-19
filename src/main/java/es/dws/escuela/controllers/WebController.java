@@ -6,12 +6,14 @@ import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
+import es.dws.escuela.services.UserService;
 import es.dws.escuela.valids.ValidDept;
 import es.dws.escuela.valids.ValidGrade;
 import es.dws.escuela.valids.ValidTeacher;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,13 +34,17 @@ public class WebController {
     TeacherService teacherService;
     @Autowired
     DepartmentService departmentService;
+    @Autowired
+    UserService userService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void init(){
         //Create some instances
         //E-Mail are generated automatically
-        Teacher teacher = new Teacher("Profesor","Uno","JDG*1NsKdf","Soy profesor 1",21);
-        Teacher teacher2 = new Teacher("Profesor","Dos","JDG*1NsKdf","Soy profesor 2",23);
+        Teacher teacher = new Teacher("Profesor","Uno",passwordEncoder.encode("JDG*1NsKdf"),"Soy profesor 1",21);
+        Teacher teacher2 = new Teacher("Profesor","Dos",passwordEncoder.encode("JDG*1NsKdf"),"Soy profesor 2",23);
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
         //Create the department into the database
@@ -54,18 +60,19 @@ public class WebController {
         gradeService.create(grade);
 
     }
-    //Components (for Thymeleaf)
-    @GetMapping("/navbar")
-    public String navbar(){
-        return "components/navbar";
-    }
-    @GetMapping("/footer")
-    public String footer(){
-        return "components/footer";
-    }
+
     @GetMapping("/")
     public String index(){
         return "home/index";
+    }
+
+    @GetMapping("/login")
+    public String login(){
+        return "home/login";
+    }
+    @GetMapping("/signup")
+    public String signup(){
+        return "forms/signup";
     }
     //Get all the teachers. There is always at least one teacher, so teacherexists=1
     @GetMapping("/teacher")
@@ -119,7 +126,7 @@ public class WebController {
             model.addAttribute("teacher",grade.getTeachers());
             return "entities/gradeProfile";
         }else{
-            return "errors/errors/404";
+            return "errors/404";
         }
     }
     @GetMapping("/department/{id}")
@@ -203,7 +210,7 @@ public class WebController {
     public String postDepartment(Model model, @Valid Department department, BindingResult br){
         if(br.hasErrors()){
             model.addAttribute("error",br.getAllErrors());
-            return "error";
+            return "forms/departmentForm";
         }
         departmentService.create(department);
         return getDepartments(model);
@@ -212,7 +219,7 @@ public class WebController {
     public String postGrade(Model model, @Valid Grade grade, BindingResult br){
         if(br.hasErrors()){
             model.addAttribute("error",br.getAllErrors());
-            return "error";
+            return "forms/gradeForm";
         }
         gradeService.create(grade);
         return getGrades(model);
@@ -245,7 +252,7 @@ public class WebController {
         Grade grade = gradeService.read(id);
         if(grade != null){
             model.addAttribute("grade",grade);
-            return "gradeForm";
+            return "forms/gradeForm";
         }else{
             return "errors/404";
         }

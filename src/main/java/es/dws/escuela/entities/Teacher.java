@@ -5,36 +5,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Teacher {
-    @Id
-    @JsonView({Views.Teacher.class, Views.Department.class, Views.Grade.class})
-    //Identifier = name.surname, all lowercase without spaces
-    private String id;
-    //Email is generated automatically, and unique
-    @Column(unique = true)
-    @JsonView(Views.Teacher.class)
-    private String email;
-    //Define each attribute, applying the necessary restrictions
-    @Column(nullable = false)
-    @JsonView(Views.Teacher.class)
-    @NotBlank(message = "Name is required")
-    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
-    private String name;
-    //Both name and surname have only latin characters
-    @Column(nullable = false)
-    @JsonView(Views.Teacher.class)
-    @NotBlank(message = "Surname is required")
-    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
-    private String surname;
+public class Teacher extends User{
     //Age only can be between 1 and 100
     @Column(nullable = false)
     @JsonView(Views.Teacher.class)
@@ -42,49 +24,37 @@ public class Teacher {
     @Min(value = 1, message = "Age cannot be negative. Must be at least 1")
     @Max(value = 100, message = "Age cannot exceed 100")
     private Integer age;
-    //Make the password at least secure
-    @Column(nullable = false)
-    @NotBlank(message = "Password is required")
-    @Pattern(regexp = "^(?=.+[a-z])(?=.+[A-Z])(?=.+[0-9])(?=.*[@#$*%^&+=?!]).{8,16}$",
-            message = """
-                    Password must have at least 8 characters, including:<ul>
-                    <li>one uppercase letter</li>
-                    <li>one lowercase letter</li>
-                    <li>one digit</li>
-                    <li>and one special character.</li></ul><br>
-                    Please check it before submitting""")
-    private String pass;
-    @JsonView(Views.Teacher.class)
-    private String description;
 
     //Relationships
     @ManyToOne
     @JsonView(Views.Teacher.class)
     private Department department;
 
-    @JsonView(Views.Teacher.class)
-    @ManyToMany(mappedBy = "teachers")
-    private List<Grade> grades;
-
     public Teacher(String name, String surname, String pass, String description, int age) {
-        this.name = name;
-        this.surname = surname;
-        this.id = name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
-        this.email = this.id+"@urdj.es";
-        this.pass = pass;
-        this.description = description;
+        super(name,surname,pass,description);
+        this.setEmail(this.getId()+"@urdj.es");
         this.age = age;
-        this.department = null;
-        this.grades = new ArrayList<>();
-    }
-
-    public void addGrade(Grade grade) {
-        this.grades.add(grade);
-        grade.getTeachers().add(this);
-    }
-    public void removeGrade(Grade grade){
-        this.grades.remove(grade);
-        grade.getTeachers().remove(this);
+        this.setRoles(new ArrayList<>(List.of("USER","TEACHER")));
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

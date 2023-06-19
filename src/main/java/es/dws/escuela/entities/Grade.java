@@ -39,6 +39,9 @@ public class Grade {
     @JsonView(Views.Grade.class)
     private List<Teacher> teachers;
 
+    @ManyToMany
+    private List<User> users;
+
 
     public Grade(String name, String description, Integer year) {
         this.name = name;
@@ -68,5 +71,9 @@ public class Grade {
     }
     public void removeTeacher(Teacher teacher){
         this.teachers.remove(teacher);
+    }
+
+    public void removeUser(User user) {
+        this.users.remove(user);
     }
 }
