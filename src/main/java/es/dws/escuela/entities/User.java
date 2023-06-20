@@ -74,14 +74,14 @@ public class User {
 
     public User(ValidCreateUser vcUser){
         this.name = vcUser.getName();
-        this.surname = surname;
+        this.surname = vcUser.getSurname();
         this.id = name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
         this.email = this.id+"@alumnos.urdj.es";
-        this.pass = pass;
-        this.description = description;
+        this.pass = vcUser.getPass();
+        this.description = vcUser.getDescription();
         this.grades = new ArrayList<>();
         //Admin can be User, Teacher and Admin
-        this.roles = new ArrayList<>(List.of(vcUser.getRoles()));
+        this.roles = new ArrayList<>(List.of("USER"));
     }
 
     public void addGrade(Grade grade) {

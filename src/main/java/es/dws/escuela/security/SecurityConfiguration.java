@@ -35,6 +35,7 @@ public class SecurityConfiguration {
                 //Allow public web views
                 authz.requestMatchers("/").permitAll();
                 authz.requestMatchers("/assets/**").permitAll();
+                authz.requestMatchers("/signup").permitAll();
                 authz.requestMatchers("/login").permitAll();
                 authz.requestMatchers("/logout").permitAll();
                 authz.requestMatchers("/error").permitAll();
@@ -44,7 +45,7 @@ public class SecurityConfiguration {
                 authz.requestMatchers(regexMatcher("/grade\\/\\d+")).permitAll();
                 authz.requestMatchers("/teacher").permitAll();
                 authz.requestMatchers(regexMatcher("/teacher\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
-                authz.requestMatchers(regexMatcher("/profile\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
+                authz.requestMatchers(regexMatcher("/user\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
                 authz.requestMatchers("/teacher/add").permitAll();
                 authz.requestMatchers("/teacherByAge").permitAll();
                 authz.requestMatchers("/department").permitAll();
@@ -54,7 +55,10 @@ public class SecurityConfiguration {
                 authz.requestMatchers("/grade/**").hasAnyRole("TEACHER", "ADMIN");
                 authz.requestMatchers("/department/**").hasRole("ADMIN");
                 authz.requestMatchers("/admin").hasRole("ADMIN");
+                authz.requestMatchers("/profile").hasRole("USER");
                 authz.requestMatchers("/profile/*").hasRole("USER");
+                authz.requestMatchers("/user/edit").hasRole("USER");
+                authz.requestMatchers("/teacher/edit").hasRole("TEACHER");
 
                 //Rest of requests are authenticated
                 authz.anyRequest().authenticated();

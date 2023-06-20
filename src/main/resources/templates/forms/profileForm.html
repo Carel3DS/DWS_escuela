@@ -15,7 +15,7 @@
 </head>
 
 <body><div th:insert="~{/components/navbar}"></div>
-    <form action="/teacher/edit" method="post">
+    <form th:action="${isTeacher}? '/teacher/edit' : '/user/edit'" method="post">
         <section class="py-4 py-md-5 my-5" style="width: 100%;">
             <div class="container py-5" style="max-width: 1200px;">
                 <div class="row">
@@ -47,11 +47,9 @@
                                     <div class="col-md-6" th:if="${isTeacher}"><label class="form-label">Edad</label><input class="form-control" type="number" name="age" value="{{teacher.age}}">
                                         <div class="alert alert-danger" role="alert"><span>{{age}}</span></div>
                                     </div>
-                                    <div class="col-md-6" style="margin-bottom: 5px;"th:if="${isTeacher}"><label class="form-label">Departamento</label><select class="form-select" name="department">
+                                    <div class="col-md-6" style="margin-bottom: 5px;" th:if="${isTeacher}"><label class="form-label">Departamento</label><select class="form-select" name="department">
                                             <optgroup label="This is a group">
-                                                <option value="12" selected="">This is item 1</option>
-                                                <option value="13">This is item 2</option>
-                                                <option value="14">This is item 3</option>
+                                                <option th:each="department: ${departments}" th:text="${department.name}" th:value="${department.id}" th:selected="${department.id} == ${profile.department.id}"></option>
                                             </optgroup>
                                         </select></div>
                                 </div>

@@ -8,14 +8,14 @@ import es.dws.escuela.services.DepartmentService;
 import es.dws.escuela.services.GradeService;
 import es.dws.escuela.services.TeacherService;
 import es.dws.escuela.services.UserService;
-import es.dws.escuela.valids.ValidDept;
-import es.dws.escuela.valids.ValidGrade;
-import es.dws.escuela.valids.ValidTeacher;
-import es.dws.escuela.valids.ValidUser;
+import es.dws.escuela.valids.*;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,8 +37,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Controller
+@Slf4j
 public class WebController {
     //TODO: self-edit using /profile/edit
 
@@ -59,7 +61,7 @@ public class WebController {
         //E-Mail are generated automatically
         Teacher teacher1 = new Teacher("Profesor","Uno",passwordEncoder.encode("profesor1"),"Soy profesor 1",21);
         Teacher teacher2 = new Teacher("Profesor","Dos",passwordEncoder.encode("profesor2"),"Soy profesor 2",23);
-        User user = new User("user","o", passwordEncoder.encode("user"),"Hola mundo");
+        User user = new User("user","o", passwordEncoder.encode("user"),"Hola mundo","USER");
         User admin = new User("admin","o", passwordEncoder.encode("admin"),"Soy Admin","USER","ADMIN");
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
@@ -92,6 +94,30 @@ public class WebController {
     @GetMapping("/signup")
     public String signup(){
         return "forms/signup";
+    }
+
+    @PostMapping("/signup")
+    public String signup(Model model, HttpServletRequest request, @Valid ValidCreateUser vcUser, BindingResult br)
+            throws ServletException {
+        if(br.hasErrors()){
+            for (FieldError e:br.getFieldErrors()){
+                model.addAttribute(e.getField(),e.getDefaultMessage());
+            }
+            model.addAttribute("ignore",1);
+            model.addAttribute("formerror",1);
+            return "forms/signup";
+        }
+        String plainPass = vcUser.getPass();
+        vcUser.setPass(passwordEncoder.encode(vcUser.getPass()));
+        try{
+            User user = userService.create(new User(vcUser));
+            request.login(user.getId(), plainPass);
+            return "redirect:/profile";
+        }catch (ServletException e){
+            log.error(e.toString());
+            throw e;
+        }
+
     }
 
     @GetMapping("/profile")
@@ -328,12 +354,17 @@ public class WebController {
         }
     }
 
-    @GetMapping("/profile/{id}")
+    @GetMapping("/user/{id}")
     public String getUserProfile(Model model,@PathVariable String id) {
-        model.addAttribute("profile",userService.read(id));
-        model.addAttribute("isTeacher",false);
-        model.addAttribute("self",false);
-        return "entities/profile";
+        User user = userService.read(id);
+        if(user != null){
+            model.addAttribute("profile", user);
+            model.addAttribute("isTeacher",false);
+            model.addAttribute("self",false);
+            return "entities/profile";
+        }else {
+            return "errors/404";
+        }
     }
 
     //Grade edit
@@ -391,9 +422,11 @@ public class WebController {
             return "errors/403";
         }
     }
-    //self-methods for both Teacher and User-type users
-    @GetMapping("/profile/delete")
-    public String deleteTeacher(){
+    //self-methods for  Teacher and User-type users
+    
+    //Valid for teacher and user
+    @GetMapping("/user/delete")
+    public String deleteProfile(){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -421,6 +454,7 @@ public class WebController {
             return "errors/403";
         }
     }
+    //Valid for Both for teacher and user type
     @GetMapping("/profile/edit")
     String editProfile(Model model){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
@@ -428,13 +462,14 @@ public class WebController {
         model.addAttribute("isTeacher", roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER")));
         if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             model.addAttribute("profile",teacherService.read(id));
+            model.addAttribute("departments",departmentService.readAll());
         }else{
             model.addAttribute("profile",userService.read(id));
         }
 
         return "forms/profileForm";
     }
-
+    //Valid only for Users
     @PostMapping("/user/edit")
     String UpdateUser(Model model, @Valid ValidUser user, BindingResult br){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
@@ -445,6 +480,22 @@ public class WebController {
             }
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             userService.update(id,user);
+            return "redirect:/profile";
+        }else {
+            return "errors/403";
+        }
+    }
+    //Valid only for Teachers
+    @PostMapping("/teacher/edit")
+    String UpdateTeacher(Model model, @Valid ValidTeacher teacher, BindingResult br){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+            if(br.hasErrors()){
+                model.addAttribute("error",br.getAllErrors());
+                return "forms/profileForm";
+            }
+            String id = SecurityContextHolder.getContext().getAuthentication().getName();
+            teacherService.update(id,teacher);
             return "redirect:/profile";
         }else {
             return "errors/403";
@@ -488,5 +539,8 @@ public class WebController {
             return "errors/404";
         }
     }
+
+    // ENROLLING GRADE METHODS //
+    //TODO: enroll grade methods
 
 }

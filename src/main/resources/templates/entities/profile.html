@@ -35,7 +35,7 @@
                                 <div class="col text-center"><a class="btn btn-primary btn-secondary" th:if="${self}" href="/profile/edit" type="button">Editar</a></div>
                             </div>
                             <div class="row text-center" style="margin-top: 10px;">
-                                <div class="col"><a class="text-light" th:if="${self}" th:href="${isTeacher}? '/teacher/delete/self':'/user/delete'">Eliminar Cuenta</a></div>
+                                <div class="col"><a class="text-light" th:if="${self}" href="/user/delete">Eliminar Cuenta</a></div>
                             </div>
                         </div>
                     </div>
