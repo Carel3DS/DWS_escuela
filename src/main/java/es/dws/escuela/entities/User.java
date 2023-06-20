@@ -47,11 +47,11 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
-    //Make the password at least secure
+    //Password (format is checked in the ValidCreateUser class)
     @Column(nullable = false)
     @NotBlank(message = "Password is required")
-
     private String pass;
+
     @JsonView(Views.User.class)
     private String description;
 
@@ -63,8 +63,8 @@ public class User {
     public User(String name, String surname, String pass, String description, String ... roles) {
         this.name = name;
         this.surname = surname;
-        this.id = name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
-        this.email = this.id+"@alumnos.urdj.es";
+        this.id = "al."+name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
+        this.email = this.id+"@urdj.es";
         this.pass = pass;
         this.description = description;
         this.grades = new ArrayList<>();
@@ -75,7 +75,7 @@ public class User {
     public User(ValidCreateUser vcUser){
         this.name = vcUser.getName();
         this.surname = vcUser.getSurname();
-        this.id = name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
+        this.id = "al."+name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
         this.email = this.id+"@alumnos.urdj.es";
         this.pass = vcUser.getPass();
         this.description = vcUser.getDescription();

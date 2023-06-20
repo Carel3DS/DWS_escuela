@@ -12,16 +12,11 @@ import es.dws.escuela.valids.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,13 +29,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.logging.Logger;
 
 @Controller
-@Slf4j
+@Slf4j //Ad-hoc solution to enable custom logs in the WebController
 public class WebController {
     //TODO: self-edit using /profile/edit
 
@@ -77,7 +69,7 @@ public class WebController {
         //Associate the grade to the teachers and the user and create the grade
         grade.addTeacher(teacher1);
         grade.addTeacher(teacher2);
-        grade.addUser(user);
+        //grade.addUser(user);
         gradeService.create(grade);
 
     }
@@ -186,6 +178,16 @@ public class WebController {
     public String getGradeProfile(Model model, @PathVariable Long id){
         Grade grade = gradeService.read(id);
         if(grade != null){
+            //Check if user is logged in and its roles
+            var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+            String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+            if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+                model.addAttribute("profile",teacherService.read(userId));
+            } else if (roles.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
+                model.addAttribute("profile",userService.read(userId));
+            }
+            //Add model attributes
+            model.addAttribute("isTeacher", roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER")));
             model.addAttribute("grade",grade);
             model.addAttribute("teacher",grade.getTeachers());
             return "entities/gradeProfile";
@@ -521,8 +523,45 @@ public class WebController {
         }
     }
 
-    //Remove teacher from Grade/Department
-    @GetMapping("/grade/remove")
+    // ASIGNMENTS //
+
+    //Admin-only management routes
+    @GetMapping("/grade/assignTeacher")
+    public String assignTeacherToGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
+        if(gradeService.gradeExists(id) && teacherService.teacherExists(teacherId)) {
+            if (teacherService.assignGrade(teacherId, id) != null) {
+                return getTeacherProfile(model, teacherId);
+            } else {
+                return "errors/error";
+            }
+        }else {
+            return "errors/404";
+        }
+    }
+    @GetMapping("/grade/assignUser")
+    public String assignUserToGrade(Model model, @RequestParam Long id, @RequestParam String userId){
+       if(gradeService.gradeExists(id) && userService.userExists(userId)) {
+           if(userService.assignGrade(userId, id) != null){
+               return getUserProfile(model,userId);
+           }else{
+               return "errors/error";
+           }
+       }else {
+           return "errors/404";
+       }
+    }
+
+    @GetMapping("/department/assignTeacher")
+    public String assignTeacherToDepartment(Model model, @RequestParam Long id, @RequestParam String teacherId){
+        if(teacherService.setDepartment(teacherId, id) != null){
+            return getTeacherProfile(model,teacherId);
+        }else{
+            return "errors/404";
+        }
+    }
+    
+    //Remove teacher/user from Grade
+    @GetMapping("/grade/removeTeacher")
     public String removeTeacherFromGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
         if(teacherService.removeGrade(teacherId,id) != null){
             return getTeacherProfile(model,teacherId);
@@ -530,7 +569,16 @@ public class WebController {
             return "errors/404";
         }
     }
-
+    @GetMapping("/grade/removeUser")
+    public String removeUserFromGrade(Model model, @RequestParam Long id, @RequestParam String userId){
+        if(userService.removeGrade(userId,id) != null){
+            return getUserProfile(model,userId);
+        }else{
+            return "errors/404";
+        }
+    }
+    
+    //Remove teacher from department
     @GetMapping("/department/remove")
     public String removeTeacherFromDept(Model model, @RequestParam String teacherId){
         if(teacherService.removeDept(teacherId) != null){
@@ -541,6 +589,42 @@ public class WebController {
     }
 
     // ENROLLING GRADE METHODS //
-    //TODO: enroll grade methods
+
+    //Self-enrolls a user into a grade
+    @GetMapping("/grade/enroll")
+    public String enroll(@RequestParam Long id){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Grade grade = gradeService.read(id);
+        if(grade != null){
+            //User must not be a teacher
+            if( roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+                userService.assignGrade(userId,id);
+                return "redirect:/grade/"+id;
+            }else {
+                return "errors/403";
+            }
+        }else {
+            return "errors/404";
+        }
+        
+    }
+
+    //Makes the user/teacher leave a grade.
+    @GetMapping("/grade/leave")
+    public String leave(Model model, @RequestParam long id){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+            removeTeacherFromGrade(model,id,userId);
+            return "redirect:/grade/"+id;
+        }else if(roles.contains(new SimpleGrantedAuthority("ROLE_USER"))){
+            removeUserFromGrade(model,id,userId);
+            return "redirect:/grade/"+id;
+        }else {
+            return "errors/403";
+        }
+    }
+
 
 }

@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+//Due to technical limitations, this class is called Grade
 public class Grade {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

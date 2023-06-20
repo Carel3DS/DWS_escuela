@@ -20,8 +20,7 @@ public class DepartmentRESTController {
 
     @Autowired
     private DepartmentService service;
-    @Autowired
-    private TeacherService teacherService;
+
     //REST DEPARTMENT
     @PostMapping("/department")
     @JsonView(Views.Department.class)

@@ -4,17 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
@@ -26,12 +32,16 @@ import static org.springframework.security.web.util.matcher.RegexRequestMatcher.
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-    // TODO: make proper Security Configuration
+
     @Autowired
     RepositoryUserDetailsService userDetailsService;
+
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((authz) ->{
+    @Order(2)
+    public SecurityFilterChain filterWebChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/")
+        .authorizeHttpRequests((authz) ->{
                 //Allow public web views
                 authz.requestMatchers("/").permitAll();
                 authz.requestMatchers("/assets/**").permitAll();
@@ -51,14 +61,25 @@ public class SecurityConfiguration {
                 authz.requestMatchers("/department").permitAll();
                 authz.requestMatchers(regexMatcher("/department\\/\\d+")).permitAll();
 
-                //Private views
-                authz.requestMatchers("/grade/**").hasAnyRole("TEACHER", "ADMIN");
-                authz.requestMatchers("/department/**").hasRole("ADMIN");
-                authz.requestMatchers("/admin").hasRole("ADMIN");
+                //Authenticated views
+                authz.requestMatchers("/grade/enroll").hasRole("USER");
                 authz.requestMatchers("/profile").hasRole("USER");
                 authz.requestMatchers("/profile/*").hasRole("USER");
                 authz.requestMatchers("/user/edit").hasRole("USER");
+
+                //Teacher and Admin views
                 authz.requestMatchers("/teacher/edit").hasRole("TEACHER");
+                authz.requestMatchers("/grade/add").hasAnyRole("TEACHER", "ADMIN");
+                authz.requestMatchers("/grade/edit").hasAnyRole("TEACHER", "ADMIN");
+                authz.requestMatchers("/grade/delete").hasAnyRole("TEACHER", "ADMIN");
+
+                //Admin only views
+                authz.requestMatchers("/department/**").hasRole("ADMIN");
+                authz.requestMatchers("/grade/assignTeacher").hasRole("ADMIN");
+                authz.requestMatchers("/grade/assignUser").hasRole("ADMIN");
+                authz.requestMatchers("/grade/removeTeacher").hasRole("ADMIN");
+                authz.requestMatchers("/grade/assignUser").hasRole("ADMIN");
+                authz.requestMatchers("/admin").hasRole("ADMIN");
 
                 //Rest of requests are authenticated
                 authz.anyRequest().authenticated();
@@ -87,5 +108,15 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10, new SecureRandom());
     }
-
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
+    }
 }

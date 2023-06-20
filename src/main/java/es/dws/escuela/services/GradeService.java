@@ -104,7 +104,7 @@ public class GradeService {
         boolean found = false;
         int i = 0;
         //Find the teacher and remove from the list (O(N))
-        while (!found){
+        while (!found && i < teachers.size()){
             Teacher t = teachers.get(i);
             if (t.getId().equals(teacherId)){
                 teachers.remove(i);
@@ -124,7 +124,7 @@ public class GradeService {
         boolean found = false;
         int i = 0;
         //Find the user and remove from the list (O(N))
-        while (!found){
+        while (!found  && i < users.size()){
             User t = users.get(i);
             if (t.getId().equals(userId)){
                 users.remove(i);
@@ -137,5 +137,8 @@ public class GradeService {
         repository.save(grade);
     }
 
-    
+
+    public boolean gradeExists(long id) {
+        return this.repository.existsById(id);
+    }
 }

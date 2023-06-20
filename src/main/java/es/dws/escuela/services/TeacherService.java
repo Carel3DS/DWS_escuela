@@ -9,7 +9,6 @@ import es.dws.escuela.valids.ValidTeacher;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ public class TeacherService {
     private DepartmentService departmentService;
 
     public Teacher create(Teacher teacher){
-        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;;
+        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
         teacher.setDescription(policy.sanitize(teacher.getDescription()));
         return repository.save(teacher);
     }
@@ -65,8 +64,15 @@ public class TeacherService {
             if(newTeacher.getAge() != null){
                 teacher.setAge(newTeacher.getAge());
             }
-            repository.save(teacher);
-            return teacher;
+            if(!newTeacher.getDepartmentID().equals(teacher.getDepartment().getId())){
+                if(newTeacher.getDepartmentID().equals(0L)){
+                    return this.removeDept(teacher.getId());
+                }
+                return this.setDepartment(teacher.getName(), newTeacher.getDepartmentID());
+            }else{
+                repository.save(teacher);
+                return teacher;
+            }
         }else{
             return null;
         }
@@ -120,7 +126,7 @@ public class TeacherService {
         Teacher teacher = this.read(teacherId);
         if (teacher != null){
             Grade grade = this.gradeService.read(gradeId);
-            if(grade != null){
+            if(grade != null && !teacher.getGrades().contains(grade)){
                 teacher.addGrade(grade);
                 this.gradeService.addTeacher(teacher,gradeId);
                 return teacher;
@@ -192,4 +198,36 @@ public class TeacherService {
         }
     }
 
+    public Teacher setDepartment(String teacherId, Long id) {
+        Teacher teacher = this.read(teacherId);
+        Department newDept = departmentService.read(id);
+        if (teacher != null && newDept != null){
+            Department department = teacher.getDepartment();
+            if(department != null){
+                department.removeTeacher(teacher);
+            }
+            newDept.addTeacher(teacher);
+            teacher.setDepartment(newDept);
+            repository.save(teacher);
+            return teacher;
+        }else {
+            return null;
+        }
+    }
+
+    public Teacher setDepartment(Teacher teacher, Long id) {
+        Department newDept = departmentService.read(id);
+        if (newDept != null){
+            Department department = teacher.getDepartment();
+            if(department != null){
+                department.removeTeacher(teacher);
+            }
+            newDept.addTeacher(teacher);
+            teacher.setDepartment(newDept);
+            repository.save(teacher);
+            return teacher;
+        }else {
+            return null;
+        }
+    }
 }

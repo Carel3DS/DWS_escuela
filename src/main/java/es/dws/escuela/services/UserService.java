@@ -1,16 +1,12 @@
 package es.dws.escuela.services;
 
-import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.User;
 import es.dws.escuela.repositories.UserRepository;
 import es.dws.escuela.utils.HTMLPolicy;
 import es.dws.escuela.valids.ValidUser;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
-import org.owasp.html.examples.SlashdotPolicyExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +49,7 @@ public class UserService {
             //TODO: make safe update (for each attribute)
             User user = op.get();
             user.setDescription(newUser.getDescription());
-            if(newUser.getPass().length() > 0 && !newUser.getPass().equals(user.getPass())){
+            if(newUser.getPass() != null && newUser.getPass().length() > 0 && !newUser.getPass().equals(user.getPass())){
                 user.setPass(newUser.getPass());
             }
             repository.save(user);
@@ -101,7 +97,7 @@ public class UserService {
         }
     }
 
-    //remove grade from user if assigned. Delete grade if the grade has no users
+    //remove grade from user if assigned.
     public User removeGrade(String userId, Long gradeId){
         User user = this.read(userId);
         if (user != null){
@@ -109,9 +105,6 @@ public class UserService {
             if(grade != null){
                 user.removeGrade(grade);
                 this.gradeService.removeUserFromGrade(gradeId,userId);
-                if(grade.getUsers().isEmpty()){
-                    gradeService.delete(gradeId);
-                }
                 return user;
             }else {
                 return null;
@@ -121,7 +114,7 @@ public class UserService {
         }
     }
 
-    //Remove all the grades from the grade list of the user. Delete grades if the grades have no users
+    //Remove all the grades from the grade list of the user.
     public User removeAllGrades(String userId){
         Optional<User> op = repository.findById(userId);
         if(op.isPresent()){
@@ -129,9 +122,6 @@ public class UserService {
             if (!user.getGrades().isEmpty()){
                 for(Grade g:user.getGrades()){
                     g.removeUser(user);
-                    if(g.getUsers().isEmpty()){
-                        gradeService.delete(g.getId());
-                    }
                 }
                 user.getGrades().clear();
                 repository.save(user);
