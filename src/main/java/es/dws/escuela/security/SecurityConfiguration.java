@@ -44,6 +44,7 @@ public class SecurityConfiguration {
                 authz.requestMatchers(regexMatcher("/grade\\/\\d+")).permitAll();
                 authz.requestMatchers("/teacher").permitAll();
                 authz.requestMatchers(regexMatcher("/teacher\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
+                authz.requestMatchers(regexMatcher("/profile\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
                 authz.requestMatchers("/teacher/add").permitAll();
                 authz.requestMatchers("/teacherByAge").permitAll();
                 authz.requestMatchers("/department").permitAll();

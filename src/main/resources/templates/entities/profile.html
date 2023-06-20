@@ -32,10 +32,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col text-center"><button class="btn btn-primary btn-secondary" th:href="${isTeacher}? '/teacher/edit?id='+${profile.id}: '/profile/edit?id='+${profile.id}" type="button">Editar</button></div>
+                                <div class="col text-center"><a class="btn btn-primary btn-secondary" th:if="${self}" href="/profile/edit" type="button">Editar</a></div>
                             </div>
                             <div class="row text-center" style="margin-top: 10px;">
-                                <div class="col"><a class="text-light" th:href="${isTeacher}? '/teacher/delete/self':'/user/delete'">Eliminar Cuenta</a></div>
+                                <div class="col"><a class="text-light" th:if="${self}" th:href="${isTeacher}? '/teacher/delete/self':'/user/delete'">Eliminar Cuenta</a></div>
                             </div>
                         </div>
                     </div>

@@ -11,6 +11,7 @@ import es.dws.escuela.services.UserService;
 import es.dws.escuela.valids.ValidDept;
 import es.dws.escuela.valids.ValidGrade;
 import es.dws.escuela.valids.ValidTeacher;
+import es.dws.escuela.valids.ValidUser;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -94,8 +95,9 @@ public class WebController {
     }
 
     @GetMapping("/profile")
-    public String profile(Model model, HttpServletRequest request){
-        if(request.getSession() != null){
+    public String profile(Model model){
+        if(SecurityContextHolder.getContext() != null){
+            model.addAttribute("self",true);
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
             User user= userService.read(username);
             if (user == null){
@@ -279,8 +281,8 @@ public class WebController {
 
 
     //Edit controllers
-    @GetMapping("/teacher/edit")
-    public String editTeacher(Model model, @RequestParam String id){
+    @GetMapping("/teacher/edit/{id}")
+    public String editTeacher(Model model, @PathVariable String id){
         Teacher teacher = teacherService.read(id);
         if(teacher != null){
             model.addAttribute("teacher",teacher);
@@ -289,14 +291,51 @@ public class WebController {
             return "errors/404";
         }
     }
-    @PostMapping("/teacher/edit")
-    public String putEditTeacher(Model model, @RequestParam String id, @Valid ValidTeacher newTeacher){
-        if(teacherService.update(id,newTeacher) != null){
-            return getTeacherProfile(model,id);
+    @PostMapping("/teacher/edit/{id}")
+    public String updateTeacher(Model model, @PathVariable String id, @Valid ValidTeacher teacher, BindingResult br){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            if(br.hasErrors()){
+                model.addAttribute("error",br.getAllErrors());
+                return "forms/profileForm";
+            }
+            //If validation is correct, check if the teacher with this id exists and update it
+            if(teacherService.update(id,teacher) != null){
+                return getTeacherProfile(model,id);
+            }else {
+                return "errors/404";
+            }
         }else {
-            return "errors/404";
+            return "errors/403";
         }
     }
+    @PostMapping("/user/edit/{id}")
+    public String updateUser(Model model, @PathVariable String id, @Valid ValidUser user, BindingResult br){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            if(br.hasErrors()){
+                model.addAttribute("error",br.getAllErrors());
+                return "forms/profileForm";
+            }
+            //If validation is correct, check if the user with this id exists and update it
+            if(userService.update(id,user) != null){
+                return getUserProfile(model,id);
+            }else {
+                return "errors/404";
+            }
+        }else {
+            return "errors/403";
+        }
+    }
+
+    @GetMapping("/profile/{id}")
+    public String getUserProfile(Model model,@PathVariable String id) {
+        model.addAttribute("profile",userService.read(id));
+        model.addAttribute("isTeacher",false);
+        model.addAttribute("self",false);
+        return "entities/profile";
+    }
+
     //Grade edit
     @GetMapping("/grade/edit")
     public String editGrade(Model model, @RequestParam Long id){
@@ -309,7 +348,7 @@ public class WebController {
         }
     }
     @PostMapping("/grade/edit")
-    public String putEditGrade(Model model, @RequestParam Long id, @Valid ValidGrade newGrade){
+    public String updateGrade(Model model, @RequestParam Long id, @Valid ValidGrade newGrade){
         if(gradeService.update(id,newGrade) != null){
             return getGradeProfile(model,id);
         }else {
@@ -329,7 +368,7 @@ public class WebController {
         }
     }
     @PostMapping("/department/edit")
-    public String putEditDepartment(Model model, @RequestParam Long id, @Valid ValidDept newDept){
+    public String updateDepartment(Model model, @RequestParam Long id, @Valid ValidDept newDept){
         if(departmentService.update(id,newDept) != null){
             return getDepartmentProfile(model,id);
         }else {
@@ -352,8 +391,8 @@ public class WebController {
             return "errors/403";
         }
     }
-    //Why two methods for same user-context action? Because there are 2 different kind of users
-    @GetMapping("/teacher/delete/self")
+    //self-methods for both Teacher and User-type users
+    @GetMapping("/profile/delete")
     public String deleteTeacher(){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
@@ -363,30 +402,55 @@ public class WebController {
                 SecurityContextHolder.clearContext();
                 teacherService.delete(id);
                 return "redirect:/";
-            }else{
+            }
+            else{
                 return "errors/404";
             }
-        }else {
-            return "errors/403";
-        }
-    }
-    @GetMapping("/user/delete")
-    public String deleteUser(Model model){
-        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        if(roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+        }else if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             if(userService.read(id) != null){
                 //Remove session (logout) and delete teacher
                 SecurityContextHolder.clearContext();
                 userService.delete(id);
                 return "redirect:/";
-            }else{
+            }
+            else{
                 return "errors/404";
             }
+        }else{
+            return "errors/403";
+        }
+    }
+    @GetMapping("/profile/edit")
+    String editProfile(Model model){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String id = SecurityContextHolder.getContext().getAuthentication().getName();
+        model.addAttribute("isTeacher", roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER")));
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+            model.addAttribute("profile",teacherService.read(id));
+        }else{
+            model.addAttribute("profile",userService.read(id));
+        }
+
+        return "forms/profileForm";
+    }
+
+    @PostMapping("/user/edit")
+    String UpdateUser(Model model, @Valid ValidUser user, BindingResult br){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+            if(br.hasErrors()){
+                model.addAttribute("error",br.getAllErrors());
+                return "forms/profileForm";
+            }
+            String id = SecurityContextHolder.getContext().getAuthentication().getName();
+            userService.update(id,user);
+            return "redirect:/profile";
         }else {
             return "errors/403";
         }
     }
+
     @GetMapping("/department/delete")
     public String deleteDepartment(Model model, @RequestParam Long id){
         if(departmentService.read(id) != null){
