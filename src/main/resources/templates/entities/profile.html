@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html data-bs-theme="light" lang="es">
+<!DOCTYPE html >
+<html data-bs-theme="light" lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
@@ -13,7 +13,7 @@
 </head>
 
 <body><div th:insert="~{/components/navbar}"></div>
-    <section class="py-4 py-md-5 my-5" style="width: 100%;" xmlns:th="http://www.thymeleaf.org">
+    <section class="py-4 py-md-5 my-5" style="width: 100%;" >
         <div class="container py-5" style="max-width: 1200px;">
             <div class="row">
                 <div class="col col-lg-4 col-md-5">
@@ -22,7 +22,7 @@
                             <div class="row text-center">
                                 <div class="col"><img class="rounded-circle border border-3" width="100" height="80" style="width: 100px;height: 100px;margin-bottom: 10px;" src="/assets/img/logos/placeholder.jpg">
                                     <h3 class="text-center text-light" th:text="|${profile.name} ${profile.surname}|"></h3>
-                                    <h6 class="text-center text-light mb-2 text-info"></h6>
+                                    <h6 class="text-center text-light mb-2 text-info" th:text="${isTeacher}? 'Profesor':'Alumno'"></h6>
                                 </div>
                             </div>
                             <div class="row py-3">
@@ -32,10 +32,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col text-center"><button class="btn btn-primary btn-secondary" th:href="|/teacher/delete?id=${profile.id}|" type="button">Editar</button></div>
+                                <div class="col text-center"><button class="btn btn-primary btn-secondary" th:href="${isTeacher}? '/teacher/edit?id='+${profile.id}: '/profile/edit?id='+${profile.id}" type="button">Editar</button></div>
                             </div>
                             <div class="row text-center" style="margin-top: 10px;">
-                                <div class="col"><a class="text-light" th:href="|/teacher/delete?id=${profile.id}|">Eliminar Cuenta</a></div>
+                                <div class="col"><a class="text-light" th:href="${isTeacher}? '/teacher/delete/self':'/user/delete'">Eliminar Cuenta</a></div>
                             </div>
                         </div>
                     </div>
@@ -45,23 +45,23 @@
                         <div class="card-body" style="padding: 20px;">
                             <h4 class="card-title" style="padding-left: 16px;padding-bottom: 6px;">Información</h4>
                             <ul class="list-group">
-                                <li class="list-group-item">
+                                <li class="list-group-item" th:if="${isTeacher}">
                                     <div class="row">
                                         <div class="col col-lg-3 d">
-                                            <p><strong>Departamento</strong></p>
+                                            <p><strong th:if="${isTeacher}" >Departamento</strong></p>
                                         </div>
                                         <div class="col">
-                                            <p th:text="${profile.department.name}"></p>
+                                            <p th:if="${isTeacher}" th:text="${profile.department.name}"></p>
                                         </div>
                                     </div>
                                 </li>
-                                <li class="list-group-item">
+                                <li class="list-group-item" th:if="${isTeacher}">
                                     <div class="row">
                                         <div class="col col-lg-3 d">
-                                            <p><strong>Edad</strong></p>
+                                            <p th:if="${isTeacher}"><strong>Edad</strong></p>
                                         </div>
                                         <div class="col">
-                                            <p th:text="${profile.age}"></p>
+                                            <p th:if="${isTeacher}" th:text="${profile.age}"></p>
                                         </div>
                                     </div>
                                 </li>

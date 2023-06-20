@@ -12,8 +12,15 @@ import es.dws.escuela.valids.ValidDept;
 import es.dws.escuela.valids.ValidGrade;
 import es.dws.escuela.valids.ValidTeacher;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,10 +31,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class WebController {
+    //TODO: self-edit using /profile/edit
 
     @Autowired
     GradeService gradeService;
@@ -47,7 +59,7 @@ public class WebController {
         Teacher teacher1 = new Teacher("Profesor","Uno",passwordEncoder.encode("profesor1"),"Soy profesor 1",21);
         Teacher teacher2 = new Teacher("Profesor","Dos",passwordEncoder.encode("profesor2"),"Soy profesor 2",23);
         User user = new User("user","o", passwordEncoder.encode("user"),"Hola mundo");
-        User admin = new User("admin","o", passwordEncoder.encode("user"),"Hola mundo","USER","ADMIN");
+        User admin = new User("admin","o", passwordEncoder.encode("admin"),"Soy Admin","USER","ADMIN");
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
         //Create the department into the database
@@ -79,6 +91,28 @@ public class WebController {
     @GetMapping("/signup")
     public String signup(){
         return "forms/signup";
+    }
+
+    @GetMapping("/profile")
+    public String profile(Model model, HttpServletRequest request){
+        if(request.getSession() != null){
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user= userService.read(username);
+            if (user == null){
+                Teacher teacher = teacherService.read(username);
+                if (teacher == null){
+                    return "errors/404";
+                }
+                model.addAttribute("profile",teacher);
+                model.addAttribute("isTeacher",true);
+                return "entities/profile";
+            }
+            model.addAttribute("profile",user);
+            model.addAttribute("isTeacher",false);
+            return "entities/profile";
+        }else {
+            return "errors/400";
+        }
     }
     //Get all the teachers. There is always at least one teacher, so teacherexists=1
     @GetMapping("/teacher")
@@ -113,6 +147,7 @@ public class WebController {
         Teacher teacher = teacherService.read(id);
         if(teacher != null){
             model.addAttribute("profile",teacher);
+            model.addAttribute("isTeacher",true);
             return "entities/profile";
         }else{
             return "errors/404";
@@ -209,21 +244,37 @@ public class WebController {
     }
     @PostMapping("/department/add")
     public String postDepartment(Model model, @Valid Department department, BindingResult br){
-        if(br.hasErrors()){
-            model.addAttribute("error",br.getAllErrors());
-            return "forms/departmentForm";
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            if(br.hasErrors()){
+                model.addAttribute("error",br.getAllErrors());
+                return "forms/departmentForm";
+            }
+            department.setTeachers(new ArrayList<>());
+            departmentService.create(department);
+            return getDepartments(model);
+        }else {
+            return "errors/403";
         }
-        departmentService.create(department);
-        return getDepartments(model);
     }
     @PostMapping("/grade/add")
-    public String postGrade(Model model, @Valid Grade grade, BindingResult br){
-        if(br.hasErrors()){
-            model.addAttribute("error",br.getAllErrors());
-            return "forms/gradeForm";
+    public String postGrade(Model model, @Valid Grade grade,BindingResult br){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))||roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            if(br.hasErrors()){
+                model.addAttribute("error",br.getAllErrors());
+                return "forms/gradeForm";
+            }
+            grade.setTeachers(new ArrayList<>());
+            if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+                Teacher teacher = teacherService.read(SecurityContextHolder.getContext().getAuthentication().getName());
+                grade.addTeacher(teacher);
+            }
+            gradeService.create(grade);
+            return getGrades(model);
+        }else {
+            return "errors/403";
         }
-        gradeService.create(grade);
-        return getGrades(model);
     }
 
 
@@ -246,7 +297,6 @@ public class WebController {
             return "errors/404";
         }
     }
-    //TODO: (DONE) implement edit controllers for Grade and Department
     //Grade edit
     @GetMapping("/grade/edit")
     public String editGrade(Model model, @RequestParam Long id){
@@ -290,11 +340,51 @@ public class WebController {
     //Delete controllers
     @GetMapping("/teacher/delete")
     public String deleteTeacher(Model model, @RequestParam String id){
-        if(teacherService.read(id) != null){
-            teacherService.delete(id);
-            return getTeachers(model);
-        }else{
-            return "errors/404";
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            if(teacherService.read(id) != null){
+                teacherService.delete(id);
+                return getTeachers(model);
+            }else{
+                return "errors/404";
+            }
+        }else {
+            return "errors/403";
+        }
+    }
+    //Why two methods for same user-context action? Because there are 2 different kind of users
+    @GetMapping("/teacher/delete/self")
+    public String deleteTeacher(){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+            String id = SecurityContextHolder.getContext().getAuthentication().getName();
+            if(teacherService.read(id) != null){
+                //Remove session (logout) and delete teacher
+                SecurityContextHolder.clearContext();
+                teacherService.delete(id);
+                return "redirect:/";
+            }else{
+                return "errors/404";
+            }
+        }else {
+            return "errors/403";
+        }
+    }
+    @GetMapping("/user/delete")
+    public String deleteUser(Model model){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+            String id = SecurityContextHolder.getContext().getAuthentication().getName();
+            if(userService.read(id) != null){
+                //Remove session (logout) and delete teacher
+                SecurityContextHolder.clearContext();
+                userService.delete(id);
+                return "redirect:/";
+            }else{
+                return "errors/404";
+            }
+        }else {
+            return "errors/403";
         }
     }
     @GetMapping("/department/delete")

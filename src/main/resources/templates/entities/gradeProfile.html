@@ -37,7 +37,7 @@
                             <h4 class="card-title fw-bold">Descripción</h4>
                             <p class="card-title fw-bold" th:text="|Año: ${grade.year}|"></p>
                             <div style="min-height: 160px;" th:utext="${grade.description}"></div>
-                            <div class="float-end"><a class="btn btn-sm btn-secondary" href="/grade/join?id={{id}}" style="margin-right: 5px;">Apuntarse</a><a class="btn btn-sm btn-primary" href="/grade/edit?id={{id}}" style="margin-right: 5px;">Editar</a><a class="btn btn-sm btn-danger" href="/grade/delete?id={{id}}">Eliminar</a></div>
+                            <div class="float-end"><a class="btn btn-sm btn-secondary" href="/grade/join?id={{id}}" style="margin-right: 5px;">Apuntarse</a><a class="btn btn-sm btn-primary" th:href="|/grade/edit?id=${grade.id}|" style="margin-right: 5px;">Editar</a><a class="btn btn-sm btn-danger" th:href="|/grade/delete?id=${grade.id}|">Eliminar</a></div>
                         </div>
                     </div>
                 </div>
