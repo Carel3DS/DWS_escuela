@@ -49,7 +49,11 @@ public class SecurityConfiguration {
                 authz.requestMatchers("/department").permitAll();
                 authz.requestMatchers(regexMatcher("/department\\/\\d+")).permitAll();
 
-
+                //Private views
+                authz.requestMatchers("/grade/**").hasAnyRole("TEACHER", "ADMIN");
+                authz.requestMatchers("/department/**").hasRole("ADMIN");
+                authz.requestMatchers("/admin").hasRole("ADMIN");
+                authz.requestMatchers("/profile/*").hasRole("USER");
 
                 //Rest of requests are authenticated
                 authz.anyRequest().authenticated();

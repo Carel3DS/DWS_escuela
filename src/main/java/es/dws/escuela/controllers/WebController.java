@@ -46,7 +46,8 @@ public class WebController {
         //E-Mail are generated automatically
         Teacher teacher1 = new Teacher("Profesor","Uno",passwordEncoder.encode("profesor1"),"Soy profesor 1",21);
         Teacher teacher2 = new Teacher("Profesor","Dos",passwordEncoder.encode("profesor2"),"Soy profesor 2",23);
-        User user = new User("Fulano","Fulanito", passwordEncoder.encode("fulano"),"Hola mundo");
+        User user = new User("user","o", passwordEncoder.encode("user"),"Hola mundo");
+        User admin = new User("admin","o", passwordEncoder.encode("user"),"Hola mundo","USER","ADMIN");
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
         //Create the department into the database
@@ -57,6 +58,7 @@ public class WebController {
         teacherService.create(teacher1);
         teacherService.create(teacher2);
         userService.create(user);
+        userService.create(admin);
         //Associate the grade to the teachers and the user and create the grade
         grade.addTeacher(teacher1);
         grade.addTeacher(teacher2);
