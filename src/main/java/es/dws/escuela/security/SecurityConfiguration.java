@@ -71,6 +71,8 @@ public class SecurityConfiguration {
 
                 //Teacher and Admin views
                 authz.requestMatchers("/teacher/edit").hasRole("TEACHER");
+                authz.requestMatchers("/department/join").hasRole("TEACHER");
+                authz.requestMatchers("/department/leave").hasRole("TEACHER");
                 authz.requestMatchers("/grade/add").hasAnyRole("TEACHER", "ADMIN");
                 authz.requestMatchers("/grade/edit").hasAnyRole("TEACHER", "ADMIN");
                 authz.requestMatchers("/grade/delete").hasAnyRole("TEACHER", "ADMIN");

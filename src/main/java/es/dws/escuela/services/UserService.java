@@ -14,14 +14,11 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository repository;
-    @Autowired
-    private EntityManager entityManager;
 
     //RELATIONSHIP
     @Autowired
     private GradeService gradeService;
-    @Autowired
-    private DepartmentService departmentService;
+
 
     public User create(User user){
         PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;;
@@ -84,7 +81,7 @@ public class UserService {
             Grade grade = this.gradeService.read(gradeId);
             if(grade != null){
                 user.addGrade(grade);
-                this.gradeService.addUser(user,gradeId);
+                this.repository.save(user);
                 return user;
             }else {
                 return null;

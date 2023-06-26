@@ -15,7 +15,7 @@
 </head>
 
 <body><div th:insert="~{/components/navbar}"></div>
-    <form th:action="${isAdmin}? '/user/edit':'/user/edit/'+${profile.id}" method="post" th:object="${user}">
+    <form th:action="${isAdmin}? '/user/edit':'/user/edit/'+${user.id}" method="post" th:object="${user}">
         <section class="py-4 py-md-5 my-5" style="width: 100%;">
             <div class="container py-5" style="max-width: 1200px;">
                 <div class="row">
@@ -50,7 +50,10 @@
                                     </div>
                                 </div>
                                 <hr>
-                                <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;"><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-control" type="text" th:value="${profile.description}"  id="richtext" style="max-height: 300px;" name="description">
+                                <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;">
+                                    <span style="font-weight: normal !important;">Descripción</span>
+                                </h5>
+                                <input class="form-control" type="text" id="richtext" style="max-height: 300px;" name="description" th:value="*{description}">
                             </div>
                         </div>
                     </div>

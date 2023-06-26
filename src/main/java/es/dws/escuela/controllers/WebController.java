@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @Slf4j //Ad-hoc solution to enable custom logs in the WebController
@@ -82,13 +83,31 @@ public class WebController {
     }
 
     @GetMapping("/login")
-    public String login(User user, HttpServletRequest request){
+    public String login(User user, HttpServletRequest request, BindingResult br){
         if(request.getUserPrincipal()==null){
             return "home/login";
         }else {
             return "redirect:/";
         }
     }
+    /*@PostMapping("/login")
+    public String postLogin(User user, HttpServletRequest request, BindingResult br) throws ServletException {
+        if(request.getUserPrincipal()==null){
+            if(br.hasErrors()){
+                return "home/login";
+            }
+            try {
+                request.login(user.getId(), user.getPass());
+                return "redirect:/profile";
+            } catch (ServletException e){
+                //Whatever it throws, for user it will be credentials error
+                br.addError(new FieldError("user","credentials",e.getMessage()));
+                return "home/login";
+            }
+        }else {
+            return "redirect:/";
+        }
+    }*/
     @GetMapping("/signup")
     public String signup(User user, HttpServletRequest request){
         if(request.getUserPrincipal()==null){
@@ -257,6 +276,7 @@ public class WebController {
             model.addAttribute("department",department);
             model.addAttribute("teacher",department.getTeachers());
             model.addAttribute("isAdmin",request.isUserInRole("ROLE_ADMIN"));
+            model.addAttribute("belongs",request.getUserPrincipal() != null && teacherService.teacherExists(request.getUserPrincipal().getName()) && teacherService.read(request.getUserPrincipal().getName()).getDepartment()!= null && Objects.equals(teacherService.read(request.getUserPrincipal().getName()).getDepartment().getId(), id));
             return "entities/departmentProfile";
         }else{
             return "errors/404";
@@ -267,7 +287,7 @@ public class WebController {
     //Note: request the entity for binding
     @GetMapping("/teacher/add")
     public String getTeacherForm(Teacher teacher){
-        return "forms/teacherForm";
+        return "teacherSignup";
     }
     @GetMapping("/department/add")
     public String getDepartmentForm(Department department){
@@ -291,7 +311,7 @@ public class WebController {
                 br.addError(e);
             }
             if(br.hasErrors()){
-                return "forms/teacherForm";
+                return "teacherSignup";
             }
 
             Teacher newteacher = new Teacher(teacher.getName(),teacher.getSurname(),passwordEncoder.encode(teacher.getPass()), teacher.getAge());
@@ -302,7 +322,7 @@ public class WebController {
             }else {
                 ObjectError e = new ObjectError("ExistingTeacherError","Teacher with this name and surname already exists");
                 br.addError(e);
-                return "forms/teacherForm";
+                return "teacherSignup";
             }
         }else{
             return "redirect:/";
@@ -366,7 +386,7 @@ public class WebController {
         if(request.isUserInRole("ROLE_ADMIN")){
             if(br.hasErrors()){
                 model.addAttribute("profile", teacher);
-                return "forms/profileForm";
+                return "profileUserForm";
             }
             //If validation is correct, check if the teacher with this id exists and update it
             if(teacherService.update(id,teacher) != null){
@@ -387,7 +407,7 @@ public class WebController {
             if(user != null){
                 model.addAttribute("profile",user);
                 model.addAttribute("isAdmin",true);
-                return "forms/profileForm";
+                return "profileUserForm";
             }else{
                 return "errors/404";
             }
@@ -401,7 +421,7 @@ public class WebController {
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
             if(br.hasErrors()){
                 model.addAttribute("profile", user);
-                return "forms/profileForm";
+                return "profileUserForm";
             }
             //If validation is correct, check if the user with this id exists and update it
             if(userService.update(id,user) != null){
@@ -455,7 +475,7 @@ public class WebController {
     public String updateDepartment(@PathVariable Long id, Model model, @Validated(Groups.DepartmentGroup.class) Department newDept, BindingResult br){
         if(br.hasErrors()){
             model.addAttribute("department", newDept);
-            return "forms/profileForm";
+            return "profileUserForm";
         }
         if(departmentService.update(id,newDept) != null){
             return "redirect:/department/"+id;
@@ -468,7 +488,7 @@ public class WebController {
     // DELETE-REQUEST CONTROLLERS //
     //Teacher
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/teacher/delete")
+    @GetMapping("/teacher/delete/{id}")
     public String deleteTeacher(Model model, @RequestParam String id){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
@@ -484,7 +504,7 @@ public class WebController {
     }
     //User
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/user/delete")
+    @GetMapping("/user/delete/{id}")
     public String deleteUser(Model model, @RequestParam String id){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
@@ -535,7 +555,7 @@ public class WebController {
             return "forms/profileTeacherForm";
         }else{
             model.addAttribute("user",userService.read(id));
-            return "forms/profileForm";
+            return "forms/profileUserForm";
         }
 
 
@@ -548,20 +568,18 @@ public class WebController {
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             if(teacherService.read(id) != null){
                 //Remove session (logout) and delete teacher
-                SecurityContextHolder.clearContext();
                 teacherService.delete(id);
-                return "redirect:/";
+                return "redirect:/logout";
             }
             else{
                 return "errors/404";
             }
-        }else if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+        }else if(roles.contains(new SimpleGrantedAuthority("ROLE_USER"))){
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             if(userService.read(id) != null){
                 //Remove session (logout) and delete teacher
-                SecurityContextHolder.clearContext();
                 userService.delete(id);
-                return "redirect:/";
+                return "redirect:/logout";
             }
             else{
                 return "errors/404";
@@ -580,7 +598,7 @@ public class WebController {
         if(roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             if(br.hasErrors()){
                 model.addAttribute("error",br.getAllErrors());
-                return "forms/profileForm";
+                return "profileUserForm";
             }
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             userService.update(id,user);
@@ -693,8 +711,8 @@ public class WebController {
         }else {
             return "errors/404";
         }
-        
     }
+
 
     //Self-departures a user/teacher from a grade.
     @GetMapping("/grade/leave")
@@ -709,6 +727,43 @@ public class WebController {
             return "redirect:/grade/"+id;
         }else {
             return "errors/403";
+        }
+    }
+    //Departments (teachers only)
+    @GetMapping("/department/join")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    public String joinDept(@RequestParam Long id){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String teacherId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Department department = departmentService.read(id);
+        if(department != null){
+            //User must not be a teacher
+            if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+                teacherService.assignDept(teacherId, id);
+                return "redirect:/department/"+id;
+            }else {
+                return "errors/403";
+            }
+        }else {
+            return "errors/404";
+        }
+    }
+    @GetMapping("/department/leave")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    public String leaveDept(){
+        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String teacherId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Department department = teacherService.read(teacherId).getDepartment();
+        if(department != null){
+            //User must not be a teacher
+            if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
+                teacherService.removeDept(teacherId);
+                return "redirect:"+department.getId();
+            }else {
+                return "errors/403";
+            }
+        }else {
+            return "errors/404";
         }
     }
     

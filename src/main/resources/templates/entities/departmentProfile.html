@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body><div th:insert="~{}"></div>
+<body><div th:insert="~{/components/navbar}"></div>
     <section class="mt-5 text-center" style="padding-top: 100px;">
         <h1 class="fw-bold display-3 mb-5" th:text="${department.name}"></h1>
     </section>
@@ -37,7 +37,7 @@
                 <div class="col py-3">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title fw-bold"><em><span style="font-weight: normal !important;">Perteneces a este departamento</span></em></h6>
+                            <h6 class="card-title fw-bold"><em><span style="font-weight: normal !important;" th:if="${belongs}">Perteneces a este departamento</span></em></h6>
                             <h4 class="card-title fw-bold">Descripción</h4>
                             <div style="min-height: 160px;" th:utext="${department.description}">
                             </div>
@@ -60,7 +60,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-link btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#modal-1">Cómo cambiar dpto.</button>
+                                <a th:if="${belongs}" class="btn btn-sm btn-outline-dark" th:href="|/department/leave|" style="margin-right: 5px;">Abandonar</a>
+                                <a th:if="${teacher != null && !belongs}" class="btn btn-sm btn-secondary" th:href="|/department/join?id=${department.id}|" style="margin-right: 5px;">Unirse</a>
                                 <span th:if="${isAdmin}">
                                     <a class="btn btn-sm btn-primary" th:href="'/department/edit/'+${department.id}" style="margin-right: 5px;">Editar</a>
                                     <a class="btn btn-sm btn-danger" th:href="'/department/edit/'+${department.id}">Eliminar</a>

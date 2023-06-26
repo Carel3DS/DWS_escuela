@@ -35,7 +35,7 @@
                                 <div class="col text-center"><a class="btn btn-primary btn-secondary" th:if="${self}" href="/profile/edit" type="button">Editar</a></div>
                             </div>
                             <div class="row text-center" style="margin-top: 10px;">
-                                <div class="col"><a class="text-light" th:if="${self}" href="/user/delete">Eliminar Cuenta</a></div>
+                                <div class="col"><a class="text-light" th:if="${self}" href="/profile/delete">Eliminar Cuenta</a></div>
                             </div>
                         </div>
                     </div>
@@ -73,6 +73,16 @@
                                         </div>
                                         <div class="col">
                                             <p th:text="${profile.email}"></p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col col-lg-3 d">
+                                            <p><strong>Enlace</strong></p>
+                                        </div>
+                                        <div class="col">
+                                            <p th:text="${isTeacher}? 'www.urdj.es/teacher/'+${profile.name}:'www.urdj.es/user/'+${profile.id}"></p>
                                         </div>
                                     </div>
                                 </li>

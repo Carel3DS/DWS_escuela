@@ -54,11 +54,6 @@
                                             <span th:each="err : ${#fields.errors('age')}" th:text="${err}"></span>
                                         </div>
                                     </div>
-                                    <div class="col-md-6" style="margin-bottom: 5px;"><label class="form-label">Departamento</label><select class="form-select" name="department">
-                                            <optgroup label="This is a group">
-                                                <option th:each="department: ${departments}" th:text="${department.name}" th:value="${department.id}" th:selected="${teacher.department}? ${department.id} == ${teacher.department.id}"></option>
-                                            </optgroup>
-                                        </select></div>
                                 </div>
                                 <hr>
                                 <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;"><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-control" type="text" th:value="*{description}"  id="richtext" style="max-height: 300px;" name="description">

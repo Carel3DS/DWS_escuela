@@ -63,7 +63,7 @@ public class TeacherService {
             if(!newTeacher.getAge().equals(teacher.getAge())){
                 teacher.setAge(newTeacher.getAge());
             }
-            if(!newTeacher.getDepartment().getId().equals(teacher.getDepartment().getId())){
+            if(newTeacher.getDepartment() != null && !newTeacher.getDepartment().getId().equals(teacher.getDepartment().getId())){
                 if(newTeacher.getDepartment().getId().equals(0L)){
                     return this.removeDept(teacher.getId());
                 }
