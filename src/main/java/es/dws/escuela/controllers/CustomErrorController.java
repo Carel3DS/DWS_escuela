@@ -29,6 +29,10 @@ public class CustomErrorController implements ErrorController {
             else if(statusCode == HttpStatus.NOT_FOUND.value()) {
                 return "errors/404";
             }
+            //If Method Not Allowed
+            else if(statusCode == HttpStatus.METHOD_NOT_ALLOWED.value()) {
+                return "errors/405";
+            }
             //Internal Server Error
             else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 return "errors/500";
@@ -55,6 +59,11 @@ public class CustomErrorController implements ErrorController {
     @GetMapping("/404")
     public String error404(){
         return "errors/404";
+    }
+    //Shows 404-Error page (normal way)
+    @GetMapping("/405")
+    public String error405(){
+        return "errors/405";
     }
     //Shows 500-Error page (normal way)
     @GetMapping("/500")

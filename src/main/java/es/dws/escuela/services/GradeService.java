@@ -2,18 +2,13 @@ package es.dws.escuela.services;
 
 import es.dws.escuela.entities.*;
 import es.dws.escuela.entities.Grade;
-import es.dws.escuela.entities.Grade;
 import es.dws.escuela.repositories.GradeRepository;
 import es.dws.escuela.utils.HTMLPolicy;
-import es.dws.escuela.valids.ValidGrade;
-import org.owasp.html.HtmlPolicyBuilder;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
-import org.owasp.html.examples.EbayPolicyExample;
-import org.owasp.html.examples.SlashdotPolicyExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +16,8 @@ import java.util.Optional;
 public class GradeService {
     @Autowired
     private GradeRepository repository;
+    @Autowired
+    private EntityManager entityManager;
 
     public Grade create(Grade grade){
         PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
@@ -35,15 +32,21 @@ public class GradeService {
         return op.orElse(null);
     }
 
-    public Grade update(Long id, ValidGrade newGrade){
+    public List<Grade> readByName(String name) {
+        TypedQuery<Grade> tq = entityManager.createQuery("SELECT t FROM Grade t where t.name like ?1", Grade.class);
+        tq.setParameter(1, "%"+name+"%");
+        return tq.getResultList();
+    }
+
+    public Grade update(Long id, Grade newGrade){
         Optional<Grade> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             Grade grade = op.get();
-            if(newGrade.getYear() != null){
+            if(!newGrade.getYear().equals(grade.getYear())){
                 grade.setYear(newGrade.getYear());
             }
-            if(newGrade.getName() != null){
+            if(!newGrade.getName().equals(grade.getName())){
                 grade.setName(newGrade.getName());
             }
             grade.setDescription(newGrade.getDescription());

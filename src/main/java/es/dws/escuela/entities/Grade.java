@@ -2,6 +2,7 @@ package es.dws.escuela.entities;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -24,14 +25,15 @@ public class Grade {
     private Long id;
     @JsonView({Views.Teacher.class, Views.Grade.class})
     @Column(nullable = false)
-    @NotBlank(message = "A name is required")
-    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The name cannot contain special characters")
+    @NotBlank(message = "A name is required", groups = {Groups.GradeGroup.class})
+    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The name cannot contain special characters", groups = {Groups.GradeGroup.class})
     private String name;
     @JsonView(Views.Grade.class)
     private String description;
     @JsonView({Views.Teacher.class, Views.Grade.class})
     @Column(nullable = false)
-    @NotNull(message = "A year is required")
+    @NotNull(message = "A year is required", groups = {Groups.GradeGroup.class})
+    @Min(value = 1, message = "The year cannot be negative", groups = {Groups.GradeGroup.class})
     private Integer year;
 
 

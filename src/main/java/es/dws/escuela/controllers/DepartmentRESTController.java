@@ -2,14 +2,14 @@ package es.dws.escuela.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import es.dws.escuela.entities.Department;
+import es.dws.escuela.entities.Groups;
 import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.DepartmentService;
-import es.dws.escuela.services.TeacherService;
-import es.dws.escuela.valids.ValidDept;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class DepartmentRESTController {
 
     @PutMapping("/department/{id}")
     @JsonView(Views.Department.class)
-    public ResponseEntity<Department> put(@PathVariable Long id, @RequestBody @Valid ValidDept newDept){
+    public ResponseEntity<Department> put(@PathVariable Long id, @RequestBody @Validated(Groups.DepartmentGroup.class) Department newDept){
         Department newDepartment = service.update(id, newDept);
         if (newDepartment != null){
             return new ResponseEntity<>(newDepartment, HttpStatus.OK);

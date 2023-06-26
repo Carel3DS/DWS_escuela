@@ -15,7 +15,7 @@
 </head>
 
 <body><div th:insert="~{/components/navbar}"></div>
-    <form th:action="${isAdmin}? '/user/edit':'/user/edit/'+${profile.id}" method="post" th:object="${user}">
+    <form th:action="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}? '/teacher/edit/'+${teacher.id} : '/teacher/edit'" method="post" th:object="${teacher}">
         <section class="py-4 py-md-5 my-5" style="width: 100%;">
             <div class="container py-5" style="max-width: 1200px;">
                 <div class="row">
@@ -25,7 +25,7 @@
                                 <div class="row text-center">
                                     <div class="col"><img class="rounded-circle border border-3" width="100" height="80" style="width: 100px;height: 100px;margin-bottom: 10px;" src="/assets/img/logos/placeholder.jpg">
                                         <h3 class="text-center text-light" th:text="|*{name} *{surname}|"></h3>
-                                        <h6 class="text-center text-light mb-2 text-info"><span style="font-weight: normal !important;">Alumno</span></h6>
+                                        <h6 class="text-center text-light mb-2 text-info"><span style="font-weight: normal !important;">Profesor</span></h6>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -41,24 +41,34 @@
                                 <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;"><span style="font-weight: normal !important;">Información</span></h5>
                                 <div class="row" style="padding: 0px 16px;">
                                     <div class="col-md-6" style="margin-bottom: 5px;"><label class="form-label">Contraseña</label>
-                                        <div class="input-group"><input class="form-control" type="password" id="password" name="pass">
+                                        <div class="input-group">
+                                            <input class="form-control" type="password" id="password" name="pass">
                                             <button class="btn btn-primary" id="toggle-password" type="button"></button>
                                         </div>
-                                        <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('pass')}">
+                                        <div class="alert alert-danger" role="alert" style="margin-top: -16px;" th:if="${#fields.hasErrors('pass')}">
                                             <span th:each="err : ${#fields.errors('pass')}" th:utext="${err}"></span>
                                         </div>
                                     </div>
+                                    <div class="col-md-6"><label class="form-label">Edad</label><input class="form-control" type="number" name="age" th:value="*{age}">
+                                        <div class="alert alert-danger" role="alert" style="margin-top: -16px;" th:if="${#fields.hasErrors('age')}">
+                                            <span th:each="err : ${#fields.errors('age')}" th:text="${err}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" style="margin-bottom: 5px;"><label class="form-label">Departamento</label><select class="form-select" name="department">
+                                            <optgroup label="This is a group">
+                                                <option th:each="department: ${departments}" th:text="${department.name}" th:value="${department.id}" th:selected="${teacher.department}? ${department.id} == ${teacher.department.id}"></option>
+                                            </optgroup>
+                                        </select></div>
                                 </div>
                                 <hr>
-                                <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;"><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-control" type="text" th:value="${profile.description}"  id="richtext" style="max-height: 300px;" name="description">
+                                <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;"><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-control" type="text" th:value="*{description}"  id="richtext" style="max-height: 300px;" name="description">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-    </form>
-<div th:insert="~{//components/footer}"></div>
+    </form><div th:insert="~{//components/footer}"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/jquery.richtext.min.js"></script>

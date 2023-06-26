@@ -51,7 +51,8 @@
                                             <p><strong th:if="${isTeacher}" >Departamento</strong></p>
                                         </div>
                                         <div class="col">
-                                            <p th:if="${isTeacher}" th:text="${profile.department.name}"></p>
+                                            <p th:if="${isTeacher && profile.department != null}" th:text="${profile.department.name}"></p>
+                                            <p th:if="${isTeacher && profile.department == null}" th:text="'(Sin asignar)'"></p>
                                         </div>
                                     </div>
                                 </li>

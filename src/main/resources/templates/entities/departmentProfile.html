@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body><div th:insert="~{/components/navbar}"></div>
+<body><div th:insert="~{}"></div>
     <section class="mt-5 text-center" style="padding-top: 100px;">
         <h1 class="fw-bold display-3 mb-5" th:text="${department.name}"></h1>
     </section>
@@ -59,7 +59,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div><button class="btn btn-link btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#modal-1">Cómo cambiar dpto.</button><a class="btn btn-sm btn-primary" href="/department/edit?id={{id}}" style="margin-right: 5px;">Editar</a><a class="btn btn-sm btn-danger" href="/department/delete?id={{id}}">Eliminar</a>
+                                </div>
+                                <button class="btn btn-link btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#modal-1">Cómo cambiar dpto.</button>
+                                <span th:if="${isAdmin}">
+                                    <a class="btn btn-sm btn-primary" th:href="'/department/edit/'+${department.id}" style="margin-right: 5px;">Editar</a>
+                                    <a class="btn btn-sm btn-danger" th:href="'/department/edit/'+${department.id}">Eliminar</a>
+                                </span>
                             </div>
                         </div>
                     </div>

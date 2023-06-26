@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,24 +43,12 @@ public class Teacher{
     //Age only can be between 1 and 100
     @Column(nullable = false)
     @JsonView(Views.Teacher.class)
-    @NotNull(message = "Age is required")
-    @Min(value = 1, message = "Age cannot be negative. Must be at least 1")
-    @Max(value = 100, message = "Age cannot exceed 100")
+    @Range(min = 1, max = 100, message = "Age must be between 1 and 100")
+    @NotNull(message = "Age is required", groups = {Groups.TeacherGroup.class})
     private Integer age;
 
-    //Make the password at least secure
     @Column(nullable = false)
     @NotBlank(message = "Password is required")
-    /*
-    @Pattern(regexp = "^(?=.+[a-z])(?=.+[A-Z])(?=.+[0-9])(?=.*[@#$*%^&+=?!]).{8,16}$",
-            message = """
-                    Password must have at least 8 characters, including:<ul>
-                    <li>one uppercase letter</li>
-                    <li>one lowercase letter</li>
-                    <li>one digit</li>
-                    <li>and one special character.</li></ul><br>
-                    Please check it before submitting""")
-    */
     private String pass;
 
     //Rock and roles
@@ -85,6 +74,19 @@ public class Teacher{
         this.email = this.id+"@urdj.es";
         this.pass = pass;
         this.description = description;
+        this.age = age;
+        this.department = null;
+        this.grades = new ArrayList<>();
+        //Teachers cannot be admin
+        this.roles = new ArrayList<>(List.of("USER","TEACHER"));
+    }
+
+    public Teacher(String name, String surname, String pass, Integer age) {
+        this.name = name;
+        this.surname = surname;
+        this.id = name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
+        this.email = this.id+"@urdj.es";
+        this.pass = pass;
         this.age = age;
         this.department = null;
         this.grades = new ArrayList<>();

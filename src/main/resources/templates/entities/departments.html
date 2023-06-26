@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Features - URDJ</title>
+    <title>Departamentos - URDJ</title>
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comic+Neue&amp;display=swap">
@@ -19,15 +19,20 @@
     <section xmlns:th="http://www.thymeleaf.org">
         <div class="container py-5 py-xl-4">
             <div class="row">
-                <div class="col col-md-3 col-12 py-3">
+                <div class="col col-md-4 col-12 py-3">
                     <div class="card position-sticky">
                         <div class="card-body sticky-top" style="padding: 20px 10%;">
                             <h4 class="card-title fw-bold">Filtros</h4>
-                            <form><label class="form-label">Nombre</label>
-                                <div><input class="form-control d-inline-block" type="text" style="width: 150px;height: 30px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;margin-left: 7px;" type="submit">
+                            <form action="/departmentByName"><label class="form-label">Nombre</label>
+                                <div class="input-group mb-3" style="height: 30px;">
+                                    <input class="form-control" type="text" name="name">
+                                    <button class="btn btn-link" type="submit" style="width: 30px">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;">
 
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8 4C5.79086 4 4 5.79086 4 8C4 10.2091 5.79086 12 8 12C10.2091 12 12 10.2091 12 8C12 5.79086 10.2091 4 8 4ZM2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8C14 9.29583 13.5892 10.4957 12.8907 11.4765L17.7071 16.2929C18.0976 16.6834 18.0976 17.3166 17.7071 17.7071C17.3166 18.0976 16.6834 18.0976 16.2929 17.7071L11.4765 12.8907C10.4957 13.5892 9.29583 14 8 14C4.68629 14 2 11.3137 2 8Z" fill="currentColor"></path>
-                                    </svg></div>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8 4C5.79086 4 4 5.79086 4 8C4 10.2091 5.79086 12 8 12C10.2091 12 12 10.2091 12 8C12 5.79086 10.2091 4 8 4ZM2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8C14 9.29583 13.5892 10.4957 12.8907 11.4765L17.7071 16.2929C18.0976 16.6834 18.0976 17.3166 17.7071 17.7071C17.3166 18.0976 16.6834 18.0976 16.2929 17.7071L11.4765 12.8907C10.4957 13.5892 9.29583 14 8 14C4.68629 14 2 11.3137 2 8Z" fill="currentColor"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -36,13 +41,13 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-hover table-md">
+                                <table class="table table-hover table-md" th:if="${!#lists.isEmpty(departments)}">
                                     <thead>
                                         <tr>
                                             <th class="a">Nombre</th>
                                             <th>Ubicación</th>
                                             <th>Profesores</th>
-                                            <th style="width: 61px;"></th>
+                                            <th style="width: 61px;" sec:authorize="hasRole('ROLE_ADMIN')"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -50,16 +55,24 @@
                                             <td class="clickable"  th:text="${department.name}" th:attr="onclick=|window.location='/department/'+${department.id}|"></td>
                                             <td th:text="${department.location}"></td>
                                             <td><p th:each="teacher : ${department.teachers}" style="margin: 1px;" th:text="${teacher.name}+' '+${teacher.surname}"></p></td>
-                                            <td><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;">
-
+                                            <td th:if="${isAdmin}">
+                                                <a th:href="'/department/edit/'+${department.id}"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;">
                                                         <path d="M13.5858 3.58579C14.3668 2.80474 15.6332 2.80474 16.4142 3.58579C17.1953 4.36683 17.1953 5.63316 16.4142 6.41421L15.6213 7.20711L12.7929 4.37868L13.5858 3.58579Z" fill="currentColor"></path>
                                                         <path d="M11.3787 5.79289L3 14.1716V17H5.82842L14.2071 8.62132L11.3787 5.79289Z" fill="currentColor"></path>
-                                                    </svg></a><a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;margin-left: 5px;">
+                                                    </svg>
+                                                </a>
+                                                <a th:href="'/department/delete?id='+${department.id}"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="clickable-icon" style="font-size: 20px;margin-left: 5px;">
                                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L10 8.58579L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L11.4142 10L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L10 11.4142L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L8.58579 10L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289Z" fill="currentColor"></path>
-                                                    </svg></a></td>
+                                                    </svg></a>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div th:if="${#lists.isEmpty(departments)}">
+                                <div>
+                                    <h5>No se ha encontrado ningún departamento</h5>
+                                </div>
                             </div>
                         </div>
                     </div>

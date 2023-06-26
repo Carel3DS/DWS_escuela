@@ -40,7 +40,7 @@ public class SecurityConfiguration {
     @Bean
     @Order(2)
     public SecurityFilterChain filterWebChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/")
+        http.securityMatcher("/**")
         .authorizeHttpRequests((authz) ->{
                 //Allow public web views
                 authz.requestMatchers("/").permitAll();
@@ -53,6 +53,7 @@ public class SecurityConfiguration {
                 //Make public some entity views
                 authz.requestMatchers("/grade").permitAll();
                 authz.requestMatchers(regexMatcher("/grade\\/\\d+")).permitAll();
+                authz.requestMatchers("/gradeByName").permitAll();
                 authz.requestMatchers("/teacher").permitAll();
                 authz.requestMatchers(regexMatcher("/teacher\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
                 authz.requestMatchers(regexMatcher("/user\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
@@ -60,6 +61,7 @@ public class SecurityConfiguration {
                 authz.requestMatchers("/teacherByAge").permitAll();
                 authz.requestMatchers("/department").permitAll();
                 authz.requestMatchers(regexMatcher("/department\\/\\d+")).permitAll();
+                authz.requestMatchers("/departmentByName").permitAll();
 
                 //Authenticated views
                 authz.requestMatchers("/grade/enroll").hasRole("USER");
@@ -94,6 +96,7 @@ public class SecurityConfiguration {
             login.usernameParameter("user");
             login.passwordParameter("pass");
             login.failureUrl("/login");
+            login.defaultSuccessUrl("/profile");
         });
         //Set Logout
         http.logout(Customizer.withDefaults());

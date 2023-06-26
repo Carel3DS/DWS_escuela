@@ -5,7 +5,6 @@ import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.TeacherRepository;
 import es.dws.escuela.utils.HTMLPolicy;
-import es.dws.escuela.valids.ValidTeacher;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.owasp.html.PolicyFactory;
@@ -52,7 +51,7 @@ public class TeacherService {
         return op.orElse(null);
     }
 
-    public Teacher update(String id, ValidTeacher newTeacher){
+    public Teacher update(String id, Teacher newTeacher){
         Optional<Teacher> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
@@ -61,14 +60,14 @@ public class TeacherService {
             if(newTeacher.getPass().length() > 0 && !newTeacher.getPass().equals(teacher.getPass())){
                 teacher.setPass(newTeacher.getPass());
             }
-            if(newTeacher.getAge() != null){
+            if(!newTeacher.getAge().equals(teacher.getAge())){
                 teacher.setAge(newTeacher.getAge());
             }
-            if(!newTeacher.getDepartmentID().equals(teacher.getDepartment().getId())){
-                if(newTeacher.getDepartmentID().equals(0L)){
+            if(!newTeacher.getDepartment().getId().equals(teacher.getDepartment().getId())){
+                if(newTeacher.getDepartment().getId().equals(0L)){
                     return this.removeDept(teacher.getId());
                 }
-                return this.setDepartment(teacher.getName(), newTeacher.getDepartmentID());
+                return this.setDepartment(teacher.getName(), newTeacher.getDepartment().getId());
             }else{
                 repository.save(teacher);
                 return teacher;

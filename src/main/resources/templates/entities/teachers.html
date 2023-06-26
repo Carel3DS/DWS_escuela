@@ -38,11 +38,11 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col col-sm-4 py-2" th:each="teacher:${teachers}">
+                                <div class="col col-sm-4 py-2" th:if="${!#lists.isEmpty(teachers)}" th:each="teacher:${teachers}">
                                     <div class="card text-center card-select">
                                         <div class="card-body card-select" th:attr="onclick=|window.location='/teacher/${teacher.id}'|">
                                             <div class="float-end" style="margin-bottom: 5px;" th:if="${isAdmin}">
-                                                <a th:href="|/teacher/edit?id=${teacher.id}|">
+                                                <a th:href="|/teacher/edit/${teacher.id}|">
                                                     <svg class="clickable-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" style="font-size: 20px;">
                                                         <path d="M13.5858 3.58579C14.3668 2.80474 15.6332 2.80474 16.4142 3.58579C17.1953 4.36683 17.1953 5.63316 16.4142 6.41421L15.6213 7.20711L12.7929 4.37868L13.5858 3.58579Z" fill="currentColor"></path>
                                                         <path d="M11.3787 5.79289L3 14.1716V17H5.82842L14.2071 8.62132L11.3787 5.79289Z" fill="currentColor"></path>
@@ -56,9 +56,14 @@
                                             </div>
                                             <img class="rounded-circle" style="width: 100px;height: 100px;margin-bottom: 16px;" src="/assets/img/logos/placeholder.jpg">
                                             <h4 class="card-title" th:text="${teacher.name}+' '+${teacher.surname}"></h4>
-                                            <h6 class="text-muted card-subtitle mb-2" th:text="${teacher.department.name}"></h6>
+                                            <h6 class="text-muted card-subtitle mb-2" th:if="${teacher.department}" th:text="${teacher.department.name}"></h6>
                                             <h6 class="text-muted card-subtitle mb-2" th:text="'Edad: '+${teacher.age}"></h6>
                                         </div>
+                                    </div>
+                                </div>
+                                <div th:if="${#lists.isEmpty(teachers)}">
+                                    <div>
+                                        <h5>No se ha encontrado ningún profesor</h5>
                                     </div>
                                 </div>
                             </div>

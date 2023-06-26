@@ -20,19 +20,27 @@
                 <div class="col-md-6 text-center"><img class="img-fluid w-100" src="/assets/img/illustrations/register.svg"></div>
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
                     <h2 class="display-6 fw-bold mb-5">Regístrate como&nbsp;<span class="underline pb-1"><strong>Profesor</strong></span></h2>
-                    <form action="/teacher/add" method="post" data-bs-theme="light">
+                    <form action="/teacher/add" method="post" data-bs-theme="light" th:object="${teacher}">
                         <div class="mb-3"><input class="form-control" type="text" name="name" placeholder="Nombre">
-                            <div class="alert alert-danger" role="alert"><span><strong>Alert</strong> text.</span></div>
+                            <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('name')}">
+                                <span th:each="err : ${#fields.errors('name')}" th:text="${err}"></span>
+                            </div>
                         </div>
                         <div class="mb-3"><input class="form-control" type="text" name="surname" placeholder="Apellidos">
-                            <div class="alert alert-danger" role="alert"><span><strong>Alert</strong> text.</span></div>
+                            <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('surname')}">
+                                <span th:each="err : ${#fields.errors('surname')}" th:text="${err}"></span>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <div class="input-group"><input class="form-control" type="password" id="password" placeholder="Contraseña" name="pass"><button class="btn btn-primary" id="toggle-password" type="button"></button></div>
-                            <div class="alert alert-danger" role="alert"><span><strong>Alert</strong> text.</span></div>
+                            <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('pass')}">
+                                <span th:each="err : ${#fields.errors('pass')}" th:utext="${err}"></span>
+                            </div>
                         </div>
-                        <div class="mb-3"><input class="form-control" type="number" name="password_repeat" placeholder="Edad">
-                            <div class="alert alert-danger" role="alert"><span><strong>Alert</strong> text.</span></div>
+                        <div class="mb-3"><input class="form-control" type="number" name="age" placeholder="Edad">
+                            <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('age')}">
+                                <span th:each="err : ${#fields.errors('age')}" th:text="${err}"></span>
+                            </div>
                         </div>
                         <div class="mb-5"><button class="btn btn-primary shadow" type="submit">Crear cuenta</button></div>
                     </form>

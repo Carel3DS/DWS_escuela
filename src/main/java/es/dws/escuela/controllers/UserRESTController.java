@@ -1,20 +1,18 @@
 package es.dws.escuela.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import es.dws.escuela.entities.Groups;
 import es.dws.escuela.entities.User;
 import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.UserService;
-import es.dws.escuela.valids.ValidCreateUser;
-import es.dws.escuela.valids.ValidUser;
 import jakarta.validation.Valid;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,8 +29,7 @@ public class UserRESTController {
     //REST USER
     @PostMapping("/user")
     @JsonView(Views.User.class)
-    public ResponseEntity<User> post(@RequestBody @Valid ValidCreateUser vcuser){
-        User user = new User(vcuser);
+    public ResponseEntity<User> post(@RequestBody @Valid User user){
         user.setPass(passwordEncoder.encode(user.getPass()));
         return new ResponseEntity<>(service.create(user),HttpStatus.CREATED);
     }
@@ -55,7 +52,7 @@ public class UserRESTController {
 
     @PutMapping("/user/{id}")
     @JsonView(Views.User.class)
-    public ResponseEntity<User> put(@PathVariable String id, @RequestBody @Valid ValidUser user){
+    public ResponseEntity<User> put(@PathVariable String id, @RequestBody @Validated(Groups.UserGroup.class) User user){
         User newUser = service.update(id, user);
         if (newUser != null){
             return new ResponseEntity<>(newUser, HttpStatus.OK);

@@ -1,9 +1,7 @@
 package es.dws.escuela.entities;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import es.dws.escuela.valids.ValidCreateUser;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Inheritance
 @Table(name = "users")
 public class User {
     @Id
@@ -33,7 +30,7 @@ public class User {
     @Column(nullable = false)
     @JsonView(Views.User.class)
     @NotBlank(message = "Name is required")
-    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
+    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Name must contain only Latin characters and spaces")
     private String name;
 
     //Both name and surname have only latin characters
@@ -47,9 +44,10 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
-    //Password (format is checked in the ValidCreateUser class)
+
     @Column(nullable = false)
     @NotBlank(message = "Password is required")
+
     private String pass;
 
     @JsonView(Views.User.class)
@@ -68,19 +66,17 @@ public class User {
         this.pass = pass;
         this.description = description;
         this.grades = new ArrayList<>();
-        //Admin can be User, Teacher and Admin
+        //Set custom roles
         this.roles = new ArrayList<>(List.of(roles));
     }
 
-    public User(ValidCreateUser vcUser){
-        this.name = vcUser.getName();
-        this.surname = vcUser.getSurname();
+    public User(String name, String surname, String pass) {
+        this.name = name;
+        this.surname = surname;
         this.id = "al."+name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
-        this.email = this.id+"@alumnos.urdj.es";
-        this.pass = vcUser.getPass();
-        this.description = vcUser.getDescription();
+        this.email = this.id+"@urdj.es";
+        this.pass = pass;
         this.grades = new ArrayList<>();
-        //Admin can be User, Teacher and Admin
         this.roles = new ArrayList<>(List.of("USER"));
     }
 

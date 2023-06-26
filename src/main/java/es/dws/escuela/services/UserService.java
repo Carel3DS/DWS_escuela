@@ -1,15 +1,12 @@
 package es.dws.escuela.services;
-
 import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.User;
 import es.dws.escuela.repositories.UserRepository;
 import es.dws.escuela.utils.HTMLPolicy;
-import es.dws.escuela.valids.ValidUser;
 import jakarta.persistence.EntityManager;
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +40,7 @@ public class UserService {
         return op.orElse(null);
     }
 
-    public User update(String id, ValidUser newUser){
+    public User update(String id, User newUser){
         Optional<User> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)

@@ -21,8 +21,16 @@
                     <li class="nav-item"><a class="nav-link" href="/grade">Clases</a></li>
                     <li class="nav-item"><a class="nav-link" href="/teacher">Profesores</a></li>
                     <li class="nav-item"><a class="nav-link" href="/department">Departamentos</a></li>
-                </ul><a class="btn btn-primary shadow shadow-none" role="button" href="/login" style="border-radius: 6px;">Entrar</a>
-<a class="btn btn-link shadow shadow-none" role="button" href="/profile" style="border-radius: 6px;">Perfil</a>
+                </ul>
+                <a class="btn btn-primary shadow shadow-none" role="button" href="/login" style="border-radius: 6px;" sec:authorize="!isAuthenticated()">Entrar</a>
+                <div class="dropdown" sec:authorize="isAuthenticated()">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" style="border-radius: 6px;" data-bs-toggle="dropdown" aria-expanded="false" th:text="${#authentication.name}">
+                    </button>
+                    <ul class="dropdown-menu" style="">
+                        <li><a class="dropdown-item" href="/profile">Perfil</a></li>
+                        <li><a class="dropdown-item text-danger" href="/logout">Cerrar sesión</a></li>
+                    </ul>
+                </div>
 
             </div>
         </div>

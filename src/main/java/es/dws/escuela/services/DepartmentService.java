@@ -4,14 +4,11 @@ import es.dws.escuela.entities.Department;
 import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.repositories.DepartmentRepository;
 import es.dws.escuela.utils.HTMLPolicy;
-import es.dws.escuela.valids.ValidDept;
-import org.owasp.html.HtmlPolicyBuilder;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
-import org.owasp.html.examples.SlashdotPolicyExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +17,9 @@ import java.util.Optional;
 public class DepartmentService {
     @Autowired
     private DepartmentRepository repository;
-
+    @Autowired
+    private EntityManager entityManager;
+    
     public Department create(Department department){
         PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
         department.setDescription(policy.sanitize(department.getDescription()));
@@ -34,7 +33,13 @@ public class DepartmentService {
         return op.orElse(null);
     }
 
-    public Department update(Long id, ValidDept newDepartment){
+    public List<Department> readByName(String name) {
+        TypedQuery<Department> tq = entityManager.createQuery("SELECT t FROM Department t where t.name like ?1", Department.class);
+        tq.setParameter(1, "%"+name+"%");
+        return tq.getResultList();
+    }
+
+    public Department update(Long id, Department newDepartment){
         Optional<Department> op = repository.findById(id);
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)

@@ -18,20 +18,24 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <h2 class="display-6 fw-bold mb-4">Crear nuevo departamento</h2>
+                    <h2 class="display-6 fw-bold mb-4" th:text="${department != null ? 'Editar departamento' : 'Crear nuevo departamento'}"></h2>
                 </div>
             </div>
             <div class="row d-flex justify-content-center">
                 <div class="col-md-6 col-md-8">
                     <div>
-                        <form class="p-3 p-xl-4" method="post" data-bs-theme="light">
-                            <div class="mb-3"><input class="form-control" type="text" id="name-1" name="name" placeholder="Nombre" value="{{department.name}}"></div>
-                            <div class="alert alert-danger" role="alert" style="margin-top: -16px;"><span>{{name}}</span></div>
-                            <div class="mb-3"><input class="form-control" type="text" id="name-2" name="location" placeholder="Ubicación" value="{{department.location}}"></div>
-                            <div class="alert alert-danger" role="alert" style="margin-top: -16px;"><span>{{location}}</span></div>
+                        <form class="p-3 p-xl-4" th:action="${department != null} ? '/department/edit/'+${department.id}" method="post" data-bs-theme="light" th:object="${department}">
+                            <div class="mb-3"><input class="form-control" type="text" id="name-1" name="name" placeholder="Nombre" th:value="${department != null} ? *{name}"></div>
+                            <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('name')}">
+                                <span th:each="err : ${#fields.errors('name')}" th:text="${err}"></span>
+                            </div>
+                            <div class="mb-3"><input class="form-control" type="text" id="name-2" name="location" placeholder="Ubicación" th:value="${department != null} ? *{location}"></div>
+                            <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('location')}">
+                                <span th:each="err : ${#fields.errors('location')}" th:text="${err}"></span>
+                            </div>
                             <div class="mb-3"></div>
                             <div class="mb-3">
-                                <h5><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-control shadow" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" value="{{description}}">
+                                <h5><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-contto bindrol shadow" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" th:value="${department != null} ? ${department.description}">
                             </div>
                             <div><button class="btn btn-primary shadow d-block w-100" type="submit">Enviar</button></div>
                         </form>
