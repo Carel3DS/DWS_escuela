@@ -19,9 +19,15 @@
                 <div class="col-12 col-md-3">
                     <div class="fw-bold d-flex align-items-center mb-2"><span><img src="/assets/img/logos/logo.png" width="120" height="52"></span></div>
                 </div>
-                <div class="col-sm-4 col-md-3 text-lg-start d-flex flex-column">
+                <div sec:authorize="!isAuthenticated()" class="col-sm-4 col-md-3 text-lg-start d-flex flex-column">
                     <ul class="list-unstyled">
                         <li><a href="/teacher/add">Registrar Profesor</a></li>
+                        <li></li>
+                    </ul>
+                </div>
+                <div sec:authorize="isAuthenticated()" class="col-sm-4 col-md-3 text-lg-start d-flex flex-column">
+                    <ul class="list-unstyled">
+                        <li><a href="/profile">Tu perfil</a></li>
                         <li></li>
                     </ul>
                 </div>

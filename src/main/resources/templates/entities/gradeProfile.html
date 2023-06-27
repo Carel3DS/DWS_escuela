@@ -41,8 +41,8 @@
                                 <a class="btn btn-sm btn-secondary" th:if="${profile!=null && !isTeacher && !#lists.contains(profile.grades, grade)}" th:href="|/grade/enroll?id=${grade.id}|" style="margin-right: 5px;">Apuntarse</a>
                                 <a class="btn btn-sm btn-secondary" th:if="${profile!=null && #lists.contains(profile.grades, grade)}" th:href="|/grade/leave?id=${grade.id}|" style="margin-right: 5px;">Salir</a>
                                 <span th:if="${isAdmin || profile!=null && #lists.contains(profile.grades, grade)}">
-                                    <a class="btn btn-sm btn-primary" th:href="|/grade/edit?id=${grade.id}|" style="margin-right: 5px;">Editar</a>
-                                    <a class="btn btn-sm btn-danger" th:href="|/grade/delete?id=${grade.id}|">Eliminar</a>
+                                    <a class="btn btn-sm btn-primary" th:href="|/grade/edit/${grade.id}|" style="margin-right: 5px;">Editar</a>
+                                    <a class="btn btn-sm btn-danger" th:href="|/grade/delete/${grade.id}|">Eliminar</a>
                                 </span>
 
                             </div>

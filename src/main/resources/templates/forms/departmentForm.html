@@ -18,13 +18,13 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <h2 class="display-6 fw-bold mb-4" th:text="${department != null ? 'Editar departamento' : 'Crear nuevo departamento'}"></h2>
+                    <h2 class="display-6 fw-bold mb-4" th:text="${department.id != null ? 'Editar departamento' : 'Crear nuevo departamento'}"></h2>
                 </div>
             </div>
             <div class="row d-flex justify-content-center">
                 <div class="col-md-6 col-md-8">
                     <div>
-                        <form class="p-3 p-xl-4" th:action="${department != null} ? '/department/edit/'+${department.id}" method="post" data-bs-theme="light" th:object="${department}">
+                        <form class="p-3 p-xl-4" th:action="${department.id != null} ? '/department/edit/'+${department.id} : 'department/add'" method="post" data-bs-theme="light" th:object="${department}">
                             <div class="mb-3"><input class="form-control" type="text" id="name-1" name="name" placeholder="Nombre" th:value="${department != null} ? *{name}"></div>
                             <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('name')}">
                                 <span th:each="err : ${#fields.errors('name')}" th:text="${err}"></span>

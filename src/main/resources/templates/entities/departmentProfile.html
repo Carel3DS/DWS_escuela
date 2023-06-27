@@ -64,7 +64,7 @@
                                 <a th:if="${teacher != null && !belongs}" class="btn btn-sm btn-secondary" th:href="|/department/join?id=${department.id}|" style="margin-right: 5px;">Unirse</a>
                                 <span th:if="${isAdmin}">
                                     <a class="btn btn-sm btn-primary" th:href="'/department/edit/'+${department.id}" style="margin-right: 5px;">Editar</a>
-                                    <a class="btn btn-sm btn-danger" th:href="'/department/edit/'+${department.id}">Eliminar</a>
+                                    <a class="btn btn-sm btn-danger" th:href="'/department/delete/'+${department.id}">Eliminar</a>
                                 </span>
                             </div>
                         </div>

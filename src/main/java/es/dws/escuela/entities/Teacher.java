@@ -94,6 +94,19 @@ public class Teacher{
         this.roles = new ArrayList<>(List.of("USER","TEACHER"));
     }
 
+    public Teacher(String name, String surname, String pass, Integer age, String description, String ... roles) {
+        this.name = name;
+        this.surname = surname;
+        this.id = name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
+        this.email = this.id+"@urdj.es";
+        this.pass = pass;
+        this.age = age;
+        this.department = null;
+        this.grades = new ArrayList<>();
+        //Teachers cannot be admin
+        this.roles = new ArrayList<>(List.of(roles));
+    }
+
     public void addGrade(Grade grade) {
         this.grades.add(grade);
         grade.getTeachers().add(this);
