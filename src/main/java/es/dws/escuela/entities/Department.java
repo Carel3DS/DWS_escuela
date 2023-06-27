@@ -23,10 +23,10 @@ public class Department {
     @JsonView({Views.Teacher.class,Views.Department.class})
     @Column(nullable = false)
     @NotBlank(message = "A name is required", groups = {Groups.DepartmentGroup.class})
-    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The name cannot contain special characters", groups = {Groups.DepartmentGroup.class})
+    @Pattern(regexp = "^[a-zA-Z0-9.\\s]*$", message = "The name cannot contain special characters", groups = {Groups.DepartmentGroup.class, Groups.DepartmentOptGroup.class})
     private String name;
     @JsonView(Views.Department.class)
-    @Pattern(regexp = "^[a-zA-Z0-9.,\\s]*$", message = "The location cannot contain special characters", groups = {Groups.DepartmentGroup.class})
+    @Pattern(regexp = "^[a-zA-Z0-9.,\\s]*$", message = "The location cannot contain special characters", groups = {Groups.DepartmentGroup.class, Groups.DepartmentOptGroup.class})
     private String location;
     @JsonView(Views.Department.class)
     private String description;

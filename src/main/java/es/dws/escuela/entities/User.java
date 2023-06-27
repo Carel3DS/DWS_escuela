@@ -29,15 +29,15 @@ public class User {
     //Define each attribute, applying the necessary restrictions
     @Column(nullable = false)
     @JsonView(Views.User.class)
-    @NotBlank(message = "Name is required")
-    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Name must contain only Latin characters and spaces")
+    @NotBlank(message = "Name is required", groups = {Groups.UserGroup.class})
+    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Name must contain only Latin characters and spaces",groups = {Groups.UserGroup.class})
     private String name;
 
     //Both name and surname have only latin characters
     @Column(nullable = false)
     @JsonView(Views.User.class)
-    @NotBlank(message = "Surname is required")
-    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
+    @NotBlank(message = "Surname is required",groups = {Groups.UserGroup.class})
+    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces",groups = {Groups.UserGroup.class})
     private String surname;
 
     //Rock and Roles
@@ -46,8 +46,15 @@ public class User {
 
 
     @Column(nullable = false)
-    @NotBlank(message = "Password is required")
-
+    @NotBlank(message = "Password is required",groups = {Groups.UserGroup.class})
+    /*@Pattern(regexp = "|^(?=.+[a-z])(?=.+[A-Z])(?=.+[0-9])(?=.*[@#$*%^&+=?!]).{8,}$",
+            message = """
+                    Password must have at least 8 characters, including:<ul>
+                    <li>one uppercase letter
+                    <li>one lowercase letter</li>
+                    <li>one digit</li>
+                    <li>and one special character.</li></ul>
+                    Please check it before submitting""", groups = {Groups.UserGroup.class, Groups.UserOptGroup.class})*/
     private String pass;
 
     @JsonView(Views.User.class)
@@ -86,7 +93,6 @@ public class User {
     }
     public void removeGrade(Grade grade){
         this.grades.remove(grade);
-        grade.getUsers().remove(this);
     }
 
 }

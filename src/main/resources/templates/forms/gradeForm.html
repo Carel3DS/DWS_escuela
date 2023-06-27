@@ -38,7 +38,8 @@
                             </div>
                             <div class="mb-3"></div>
                             <div class="mb-3">
-                                <h5><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-control" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" th:field="*{description}" th:value="${grade != null} ? ${grade.description}">
+                                <h5><span style="font-weight: normal !important;">Descripción</span></h5>
+                                <textarea class="form-control" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" th:field="*{description}" th:text='${grade != null} ? ${grade.description}'></textarea>
                             </div>
                             <div><button class="btn btn-primary shadow d-block w-100" type="submit">Enviar</button></div>
                         </form>

@@ -19,10 +19,11 @@ public class DepartmentService {
     private DepartmentRepository repository;
     @Autowired
     private EntityManager entityManager;
+
+    private final static PolicyFactory POLICY = HTMLPolicy.POLICY_DEFINITION;
     
     public Department create(Department department){
-        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
-        department.setDescription(policy.sanitize(department.getDescription()));
+        department.setDescription(POLICY.sanitize(department.getDescription()));
         return repository.save(department);
     }
     public List<Department> readAll(){
@@ -49,8 +50,7 @@ public class DepartmentService {
             }
             //Location and Description can be Null
             department.setLocation(newDepartment.getLocation());
-            department.setDescription(newDepartment.getDescription());
-            //Does this overwrite the department identified by id?
+            department.setDescription(POLICY.sanitize(newDepartment.getDescription()));
             repository.save(department);
             return department;
         }else{

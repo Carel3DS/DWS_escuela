@@ -22,33 +22,41 @@ public class Teacher{
     private String id;
 
     //Email is generated automatically, and unique
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     @JsonView(Views.Teacher.class)
     private String email;
 
     //Define each attribute, applying the necessary restrictions
     @Column(nullable = false)
-    @JsonView(Views.Teacher.class)
-    @NotBlank(message = "Name is required")
-    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
+    @JsonView({Views.Teacher.class})
+    @NotBlank(message = "Name is required", groups = {Groups.TeacherGroup.class})
+    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces",groups = {Groups.TeacherGroup.class, Groups.TeacherOptGroup.class})
     private String name;
 
     //Both name and surname have only latin characters
     @Column(nullable = false)
     @JsonView(Views.Teacher.class)
-    @NotBlank(message = "Surname is required")
-    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces")
+    @NotBlank(message = "Surname is required", groups = {Groups.TeacherGroup.class})
+    @Pattern(regexp = "^$|^[\\p{L} ]+$", message = "Surname must contain only Latin characters and spaces",groups = {Groups.TeacherGroup.class, Groups.TeacherOptGroup.class})
     private String surname;
 
     //Age only can be between 1 and 100
     @Column(nullable = false)
     @JsonView(Views.Teacher.class)
-    @Range(min = 1, max = 100, message = "Age must be between 1 and 100")
     @NotNull(message = "Age is required", groups = {Groups.TeacherGroup.class})
+    @Range(min = 1, max = 100, message = "Age must be between 1 and 100", groups = {Groups.TeacherGroup.class, Groups.TeacherOptGroup.class})
     private Integer age;
 
     @Column(nullable = false)
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Password is required", groups = {Groups.TeacherGroup.class})
+    /*@Pattern(regexp = "|^(?=.+[a-z])(?=.+[A-Z])(?=.+[0-9])(?=.*[@#$*%^&+=?!]).{8,}$",
+            message = """
+                    Password must have at least 8 characters, including:<ul>
+                    <li>one uppercase letter
+                    <li>one lowercase letter</li>
+                    <li>one digit</li>
+                    <li>and one special character.</li></ul>
+                    Please check it before submitting""", groups = {Groups.TeacherGroup.class, Groups.TeacherOptGroup.class})*/
     private String pass;
 
     //Rock and roles
@@ -113,7 +121,6 @@ public class Teacher{
     }
     public void removeGrade(Grade grade){
         this.grades.remove(grade);
-        grade.getTeachers().remove(this);
     }
 
 }

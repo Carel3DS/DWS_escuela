@@ -56,7 +56,8 @@
                                     </div>
                                 </div>
                                 <hr>
-                                <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;"><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-control" type="text" th:value="*{description}"  id="richtext" style="max-height: 300px;" name="description">
+                                <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;"><span style="font-weight: normal !important;">Descripción</span></h5>
+                                <textarea class="form-control" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" th:field="*{description}" th:text='${teacher != null} ? *{description}'></textarea>
                             </div>
                         </div>
                     </div>

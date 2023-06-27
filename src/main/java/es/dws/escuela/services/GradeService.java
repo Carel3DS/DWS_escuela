@@ -18,10 +18,10 @@ public class GradeService {
     private GradeRepository repository;
     @Autowired
     private EntityManager entityManager;
+    private final static PolicyFactory POLICY = HTMLPolicy.POLICY_DEFINITION;
 
     public Grade create(Grade grade){
-        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
-        grade.setDescription(policy.sanitize(grade.getDescription()));
+        grade.setDescription(POLICY.sanitize(grade.getDescription()));
         return repository.save(grade);
     }
     public List<Grade> readAll(){
@@ -43,13 +43,13 @@ public class GradeService {
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             Grade grade = op.get();
-            if(!newGrade.getYear().equals(grade.getYear())){
+            if(newGrade.getYear() != 0 && !newGrade.getYear().equals(grade.getYear())){
                 grade.setYear(newGrade.getYear());
             }
-            if(!newGrade.getName().equals(grade.getName())){
+            if(!newGrade.getName().isEmpty() && !newGrade.getName().equals(grade.getName())){
                 grade.setName(newGrade.getName());
             }
-            grade.setDescription(newGrade.getDescription());
+            grade.setDescription(POLICY.sanitize(newGrade.getDescription()));
             //Does this overwrite the grade identified by id?
             repository.save(grade);
             return grade;

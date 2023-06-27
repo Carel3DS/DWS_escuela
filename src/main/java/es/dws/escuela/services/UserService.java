@@ -6,6 +6,7 @@ import es.dws.escuela.utils.HTMLPolicy;
 import jakarta.persistence.EntityManager;
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -14,15 +15,17 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository repository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     //RELATIONSHIP
     @Autowired
     private GradeService gradeService;
-
+    private final static PolicyFactory POLICY = HTMLPolicy.POLICY_DEFINITION;
 
     public User create(User user){
-        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;;
-        user.setDescription(policy.sanitize(user.getDescription()));
+        user.setDescription(POLICY.sanitize(user.getDescription()));user.setDescription(POLICY.sanitize(user.getDescription()));
+        user.setPass(passwordEncoder.encode(user.getPass()));
         return repository.save(user);
     }
 
@@ -42,9 +45,9 @@ public class UserService {
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             User user = op.get();
-            user.setDescription(newUser.getDescription());
+            user.setDescription(POLICY.sanitize(user.getDescription()));
             if(newUser.getPass() != null && newUser.getPass().length() > 0 && !newUser.getPass().equals(user.getPass())){
-                user.setPass(newUser.getPass());
+                user.setPass(passwordEncoder.encode(newUser.getPass()));
             }
             repository.save(user);
             return user;

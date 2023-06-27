@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,9 @@ public class TeacherService {
     private TeacherRepository repository;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    private final static PolicyFactory POLICY = HTMLPolicy.POLICY_DEFINITION;;
 
     //RELATIONSHIP
     @Autowired
@@ -28,8 +32,9 @@ public class TeacherService {
     private DepartmentService departmentService;
 
     public Teacher create(Teacher teacher){
-        PolicyFactory policy = HTMLPolicy.POLICY_DEFINITION;
-        teacher.setDescription(policy.sanitize(teacher.getDescription()));
+
+        teacher.setDescription(POLICY.sanitize(teacher.getDescription()));
+        teacher.setPass(passwordEncoder.encode(teacher.getPass()));
         return repository.save(teacher);
     }
 
@@ -56,9 +61,9 @@ public class TeacherService {
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             Teacher teacher = op.get();
-            teacher.setDescription(newTeacher.getDescription());
-            if(newTeacher.getPass().length() > 0 && !newTeacher.getPass().equals(teacher.getPass())){
-                teacher.setPass(newTeacher.getPass());
+            teacher.setDescription(POLICY.sanitize(newTeacher.getDescription()));
+            if(!newTeacher.getPass().isEmpty() && !newTeacher.getPass().equals(teacher.getPass())){
+                teacher.setPass(passwordEncoder.encode(newTeacher.getPass()));
             }
             if(!newTeacher.getAge().equals(teacher.getAge())){
                 teacher.setAge(newTeacher.getAge());

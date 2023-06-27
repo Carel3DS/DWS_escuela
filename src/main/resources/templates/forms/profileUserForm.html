@@ -15,7 +15,7 @@
 </head>
 
 <body><div th:insert="~{/components/navbar}"></div>
-    <form th:action="${isAdmin}? '/user/edit':'/user/edit/'+${user.id}" method="post" th:object="${user}">
+    <form th:action="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}? '/user/edit/'+${user.id} : '/user/edit'" method="post" th:object="${user}">
         <section class="py-4 py-md-5 my-5" style="width: 100%;">
             <div class="container py-5" style="max-width: 1200px;">
                 <div class="row">
@@ -53,7 +53,7 @@
                                 <h5 class="card-title" style="padding-left: 16px;padding-bottom: 6px;">
                                     <span style="font-weight: normal !important;">Descripción</span>
                                 </h5>
-                                <input class="form-control" type="text" id="richtext" style="max-height: 300px;" name="description" th:value="*{description}">
+                                <textarea class="form-control" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" th:field="*{description}" th:text='${user != null} ? *{description}'></textarea>
                             </div>
                         </div>
                     </div>

@@ -21,10 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,17 +43,17 @@ public class WebController {
     DepartmentService departmentService;
     @Autowired
     UserService userService;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+
 
     @PostConstruct
     public void init(){
         //Create some instances
         //E-Mail are generated automatically
-        Teacher teacher1 = new Teacher("Profesor","Uno",passwordEncoder.encode("profesor1"),"Soy profesor 1",21);
-        Teacher teacher2 = new Teacher("Profesor","Dos",passwordEncoder.encode("profesor2"),"Soy profesor 2",23);
-        User user = new User("user","o", passwordEncoder.encode("user"),"Hola mundo","USER");
-        Teacher admin = new Teacher("admin","o", passwordEncoder.encode("admin"),18,"Soy Admin","USER","TEACHER","ADMIN");
+        //Passwords are encoded in the services layer
+        Teacher teacher1 = new Teacher("Profesor","Uno","profesor1","Soy profesor 1",21);
+        Teacher teacher2 = new Teacher("Profesor","Dos","profesor2","Soy profesor 2",23);
+        User user = new User("user","o", "user","Hola mundo","USER");
+        Teacher admin = new Teacher("admin","o", "admin",18,"Soy Admin","USER","TEACHER","ADMIN");
         Grade grade = new Grade("Ciberseguridad","Clase de Ciberseguridad",2023);
         Department department = new Department("Dpto. Ciberseguridad","Departamental II", "Departamento de Ciberseguridad");
         //Create the department into the database
@@ -118,7 +115,7 @@ public class WebController {
     }
 
     @PostMapping("/signup")
-    public String signup(Model model, HttpServletRequest request, @Valid User user, BindingResult br)
+    public String signup(Model model, HttpServletRequest request, @Validated(Groups.UserGroup.class) User user, BindingResult br)
             throws ServletException {
         if(request.getUserPrincipal() == null){
             if(br.hasErrors()){
@@ -128,7 +125,6 @@ public class WebController {
             user = new User(user.getName(),user.getSurname(),user.getPass());
             if(!userService.userExists(user.getId())){
                 String pass = user.getPass();
-                user.setPass(passwordEncoder.encode(user.getPass()));
                 userService.create(user);
                 try{
                     request.login(user.getId(), pass);
@@ -167,7 +163,7 @@ public class WebController {
             return "errors/400";
         }
     }
-    
+
     // GET-ALL REQUESTS //
     @GetMapping("/teacher")
     public String getTeachers(Model model, HttpServletRequest request){
@@ -205,7 +201,7 @@ public class WebController {
         model.addAttribute("isAdmin", request.isUserInRole("ROLE_ADMIN"));
         return "entities/departments";
     }
-    
+
     @GetMapping("/department")
     public String getDepartments(Model model, HttpServletRequest request){
         List<Department> departments = departmentService.readAll();
@@ -306,27 +302,20 @@ public class WebController {
     // ENTITY FORM POSTS //
     //Note: User post is signup() method, located at Functional features section
     @PostMapping("/teacher/add")
-    public String postTeacher(Model model, HttpServletRequest request, @Valid Teacher teacher, BindingResult br) throws ServletException {
+    public String postTeacher(Model model, HttpServletRequest request, @Validated(Groups.TeacherGroup.class) Teacher teacher, BindingResult br) throws ServletException {
         if(request.getUserPrincipal()==null){
-            Integer age = teacher.getAge();
-            //Seems Valid is not working for this attribute as expected...
-            if(age == null){
-                FieldError e = new FieldError("teacher","age","Age is required");
-                br.addError(e);
-            }
             if(br.hasErrors()){
-                return "teacherSignup";
+                return "forms/teacherSignup";
             }
-
-            Teacher newteacher = new Teacher(teacher.getName(),teacher.getSurname(),passwordEncoder.encode(teacher.getPass()), teacher.getAge());
-            if(!teacherService.teacherExists(newteacher.getId())){
-                String id = teacherService.create(newteacher).getId();
-                request.login(newteacher.getId(), teacher.getPass());
+            teacher = new Teacher(teacher.getName(),teacher.getSurname(),teacher.getPass(),teacher.getAge());
+            if(!teacherService.teacherExists(teacher.getId())){
+                String pass = teacher.getPass();
+                teacherService.create(teacher);
+                request.login(teacher.getId(), pass);
                 return "redirect:/profile";
             }else {
-                ObjectError e = new ObjectError("ExistingTeacherError","Teacher with this name and surname already exists");
-                br.addError(e);
-                return "teacherSignup";
+                // Return error page if teacher exists
+                return "errors/teacherExistsError";
             }
         }else{
             return "redirect:/";
@@ -334,7 +323,7 @@ public class WebController {
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/department/add")
-    public String postDepartment(Model model, @Valid Department department, BindingResult br){
+    public String postDepartment(Model model, @Validated(Groups.DepartmentGroup.class) Department department, BindingResult br){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
             if(br.hasErrors()){
@@ -342,7 +331,7 @@ public class WebController {
             }
             department.setTeachers(new ArrayList<>());
             Long id = departmentService.create(department).getId();
-            return "redirect:/grade/"+id;
+            return "redirect:/department/"+id;
         }else {
             return "errors/403";
         }
@@ -350,12 +339,17 @@ public class WebController {
     //Prevent inconsistent grades (grades with no teacher) by checking if they are teachers
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     @PostMapping("/grade/add")
-    public String postGrade(Model model, @Valid Grade grade,BindingResult br){
+    public String postGrade(Model model, @Validated(Groups.GradeGroup.class) Grade grade, BindingResult br){
         String teacherId = SecurityContextHolder.getContext().getAuthentication().getName();
         if(teacherService.teacherExists(teacherId)){
             if(br.hasErrors()){
                 return "forms/gradeForm";
             }
+            /*//ad-hoc Not-null validation
+            if(grade.getYear() == null){
+                br.addError(new FieldError("grade","year","Age is required"));
+                return "forms/gradeForm";
+            }*/
             grade.setTeachers(new ArrayList<>());
             Teacher teacher = teacherService.read(teacherId);
             grade.addTeacher(teacher);
@@ -389,7 +383,7 @@ public class WebController {
         }
     }
     @PostMapping("/teacher/edit/{id}")
-    public String updateTeacher(Model model, @PathVariable String id, @Validated(Groups.TeacherGroup.class) Teacher teacher, HttpServletRequest request, BindingResult br){
+    public String updateTeacher(Model model, @PathVariable String id, @Validated(Groups.TeacherOptGroup.class) Teacher teacher, HttpServletRequest request, BindingResult br){
         if(request.isUserInRole("ROLE_ADMIN")){
             if(br.hasErrors()){
                 model.addAttribute("profile", teacher);
@@ -423,7 +417,7 @@ public class WebController {
         }
     }
     @PostMapping("/user/edit/{id}")
-    public String updateUser(Model model, @PathVariable String id, @Validated(Groups.UserGroup.class) User user, BindingResult br){
+    public String updateUser(Model model, @PathVariable String id, @Validated(Groups.UserOptGroup.class) User user, BindingResult br){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
             if(br.hasErrors()){
@@ -441,29 +435,41 @@ public class WebController {
         }
     }
     
-    //Grade 
+    //Grade
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
     @GetMapping("/grade/edit/{id}")
-    public String editGrade(Model model, @PathVariable Long id){
-        Grade grade = gradeService.read(id);
-        if(grade != null){
+    public String editGrade(Model model, @PathVariable Long id, HttpServletRequest request){
+        //Check if grade exists and belongs to the teacher he's requesting it or if it is admin
+        if(gradeService.gradeExists(id) && (gradeService.read(id).getTeachers().contains(teacherService.read(request.getUserPrincipal().getName())) || request.isUserInRole("ROLE_ADMIN"))){
+            Grade grade = gradeService.read(id);
+            model.addAttribute("grade",grade);
             model.addAttribute("grade",grade);
             model.addAttribute("id",id);
             return "forms/gradeForm";
         }else{
-            return "errors/404";
+            if(!gradeService.gradeExists(id)){
+                return "errors/404";
+            }else {
+                return "errors/403";
+            }
         }
     }
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
     @PostMapping("/grade/edit/{id}")
-    public String updateGrade(@PathVariable Long id, Model model, @Validated(Groups.GradeGroup.class) Grade newGrade, BindingResult br){
+    public String updateGrade(@PathVariable Long id, Model model, @Validated(Groups.GradeOptGroup.class) Grade newGrade, HttpServletRequest request, BindingResult br){
         if(br.hasErrors()){
-
             model.addAttribute("grade", newGrade);
             return "forms/gradeForm";
         }
-        if(gradeService.update(id,newGrade) != null){
-            return "redirect:/grade/"+id;
+        //Check if grade exists and belongs to the teacher he's requesting it or if it is admin
+        if(gradeService.read(id).getTeachers().contains(teacherService.read(request.getUserPrincipal().getName())) || request.isUserInRole("ROLE_ADMIN")){
+            if(gradeService.update(id,newGrade) != null){
+                return "redirect:/grade/"+id;
+            }else {
+                return "errors/404";
+            }
         }else {
-            return "errors/404";
+            return "errors/403";
         }
     }
 
@@ -479,7 +485,7 @@ public class WebController {
         }
     }
     @PostMapping("/department/edit/{id}")
-    public String updateDepartment(@PathVariable Long id, Model model, @Validated(Groups.DepartmentGroup.class) Department newDept, BindingResult br){
+    public String updateDepartment(@PathVariable Long id, Model model, @Validated(Groups.DepartmentOptGroup.class) Department newDept, BindingResult br){
         if(br.hasErrors()){
             model.addAttribute("department", newDept);
             return "profileUserForm";
@@ -499,7 +505,7 @@ public class WebController {
     public String deleteTeacher(Model model, @PathVariable String id, HttpServletRequest request){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
-            if(teacherService.read(id) != null && !request.isUserInRole("ROLE_ADMIN")){
+            if(teacherService.read(id) != null && !request.getUserPrincipal().getName().equals(id)){
                 Teacher teacher = teacherService.delete(id);
                 model.addAttribute("confirm","Usuario eliminado");
                 model.addAttribute("text","Se ha eliminado al profesor: "+teacher.getName()+" "+teacher.getSurname());
@@ -522,7 +528,7 @@ public class WebController {
     public String deleteUser(Model model, @PathVariable String id, HttpServletRequest request){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
-            if(userService.userExists(id) && !request.isUserInRole("ROLE_ADMIN")){
+            if(userService.userExists(id) && !request.getUserPrincipal().getName().equals(id)){
                 User user = userService.delete(id);
                 model.addAttribute("confirm","Usuario eliminado");
                 model.addAttribute("text","Se ha eliminado al usuario: "+user.getName()+" "+user.getSurname());
@@ -541,8 +547,8 @@ public class WebController {
     }
     //Department
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/department/delete")
-    public String deleteDepartment(Model model, @RequestParam Long id){
+    @GetMapping("/department/delete/{id}")
+    public String deleteDepartment(Model model, @PathVariable Long id){
         if(departmentService.read(id) != null){
             departmentService.delete(id);
             return "redirect:/department";
@@ -551,10 +557,10 @@ public class WebController {
         }
     }
     //Grade
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/grade/delete")
-    public String deleteGrade(Model model, @RequestParam Long id){
-        if(gradeService.read(id) != null){
+    @PreAuthorize("hasRole('TEACHER')")
+    @GetMapping("/grade/delete/{id}")
+    public String deleteGrade(Model model, @PathVariable Long id, HttpServletRequest request){
+        if(gradeService.gradeExists(id) && (gradeService.read(id).getTeachers().contains(teacherService.read(request.getUserPrincipal().getName())) || request.isUserInRole("ROLE_ADMIN"))){
             gradeService.delete(id);
             return "redirect:/grade";
         }else{
@@ -614,7 +620,7 @@ public class WebController {
     // SELF-EDIT METHODS //
     //Valid only for Users
     @PostMapping("/user/edit")
-    String UpdateUser(Model model, @Validated(Groups.UserGroup.class) User user, BindingResult br){
+    String updateUser(Model model, @Validated(Groups.UserOptGroup.class) User user, BindingResult br){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             if(br.hasErrors()){
@@ -630,7 +636,7 @@ public class WebController {
     }
     //Valid only for Teachers
     @PostMapping("/teacher/edit")
-    String UpdateTeacher(Model model, @Validated(Groups.TeacherGroup.class) Teacher teacher, BindingResult br){
+    String updateTeacher(Model model, @Validated(Groups.TeacherOptGroup.class) Teacher teacher, BindingResult br){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             if(br.hasErrors()){
@@ -649,6 +655,8 @@ public class WebController {
     // ASIGNMENTS //
 
     //Admin-only management routes
+    //TODO: check if it works
+    //TODO: make admin page
     @GetMapping("/grade/assignTeacher")
     public String assignTeacherToGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
         if(gradeService.gradeExists(id) && teacherService.teacherExists(teacherId)) {

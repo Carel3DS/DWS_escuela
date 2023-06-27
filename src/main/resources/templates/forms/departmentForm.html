@@ -24,7 +24,7 @@
             <div class="row d-flex justify-content-center">
                 <div class="col-md-6 col-md-8">
                     <div>
-                        <form class="p-3 p-xl-4" th:action="${department.id != null} ? '/department/edit/'+${department.id} : 'department/add'" method="post" data-bs-theme="light" th:object="${department}">
+                        <form class="p-3 p-xl-4" th:action="${department.id != null} ? '/department/edit/'+${department.id} : '/department/add'" method="post" data-bs-theme="light" th:object="${department}">
                             <div class="mb-3"><input class="form-control" type="text" id="name-1" name="name" placeholder="Nombre" th:value="${department != null} ? *{name}"></div>
                             <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('name')}">
                                 <span th:each="err : ${#fields.errors('name')}" th:text="${err}"></span>
@@ -35,7 +35,8 @@
                             </div>
                             <div class="mb-3"></div>
                             <div class="mb-3">
-                                <h5><span style="font-weight: normal !important;">Descripción</span></h5><input class="form-contto bindrol shadow" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" th:value="${department != null} ? ${department.description}">
+                                <h5><span style="font-weight: normal !important;">Descripción</span></h5>
+                                <textarea class="form-control" type="text" id="richtext" name="description" rows="6" placeholder="Descripción" th:field="*{description}" th:text='${department != null} ? *{description}'></textarea>
                             </div>
                             <div><button class="btn btn-primary shadow d-block w-100" type="submit">Enviar</button></div>
                         </form>
