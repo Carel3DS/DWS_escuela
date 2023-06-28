@@ -45,7 +45,7 @@ public class UserService {
         if(op.isPresent()){
             //TODO: make safe update (for each attribute)
             User user = op.get();
-            user.setDescription(POLICY.sanitize(user.getDescription()));
+            user.setDescription(POLICY.sanitize(newUser.getDescription()));
             if(newUser.getPass() != null && newUser.getPass().length() > 0 && !newUser.getPass().equals(user.getPass())){
                 user.setPass(passwordEncoder.encode(newUser.getPass()));
             }

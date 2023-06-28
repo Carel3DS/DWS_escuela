@@ -32,9 +32,8 @@ import java.util.Objects;
 @Slf4j //Ad-hoc solution to enable custom logs in the WebController
 public class WebController {
     //TODO: make editGrade view using forms/gradeForm template. Same for department
-    //TODO: set br.error fields on templates. Add not-logged-error message on login page
-    //TODO: solve no-teacher grade API REST method
-    // TODO: implement CSRF and deploy on GCP host domain
+    //TODO: Add not-logged-error message on login page
+    // TODO: deploy on GCP host domain
 
     @Autowired
     GradeService gradeService;
@@ -163,6 +162,17 @@ public class WebController {
         }else {
             return "errors/400";
         }
+    }
+
+    //Admin Page
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin")
+    public String admin(Model model){
+        model.addAttribute("users",userService.readAll());
+        model.addAttribute("teachers",teacherService.readAll());
+        model.addAttribute("grades",gradeService.readAll());
+        model.addAttribute("departments",departmentService.readAll());
+        return "home/admin";
     }
 
     // GET-ALL REQUESTS //
@@ -394,7 +404,7 @@ public class WebController {
         if(request.isUserInRole("ROLE_ADMIN")){
             if(br.hasErrors()){
                 model.addAttribute("profile", teacher);
-                return "profileUserForm";
+                return "forms/profileUserForm";
             }
             //If validation is correct, check if the teacher with this id exists and update it
             if(teacherService.update(id,teacher) != null){
@@ -415,7 +425,7 @@ public class WebController {
             if(user != null){
                 model.addAttribute("user",user);
                 model.addAttribute("isAdmin",true);
-                return "profileUserForm";
+                return "forms/profileUserForm";
             }else{
                 return "errors/404";
             }
@@ -429,11 +439,11 @@ public class WebController {
         if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
             if(br.hasErrors()){
                 model.addAttribute("profile", user);
-                return "profileUserForm";
+                return "forms/profileUserForm";
             }
             //If validation is correct, check if the user with this id exists and update it
             if(userService.update(id,user) != null){
-                return getUserProfile(model,id);
+                return "redirect:/user/"+id;
             }else {
                 return "errors/404";
             }
@@ -495,7 +505,7 @@ public class WebController {
     public String updateDepartment(@PathVariable Long id, Model model, @Validated(Groups.DepartmentOptGroup.class) Department newDept, BindingResult br){
         if(br.hasErrors()){
             model.addAttribute("department", newDept);
-            return "profileUserForm";
+            return "forms/profileUserForm";
         }
         if(departmentService.update(id,newDept) != null){
             return "redirect:/department/"+id;
@@ -645,7 +655,7 @@ public class WebController {
         if(roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             if(br.hasErrors()){
                 model.addAttribute("error",br.getAllErrors());
-                return "profileUserForm";
+                return "forms/profileUserForm";
             }
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             userService.update(id,user);
@@ -676,40 +686,7 @@ public class WebController {
 
     //Admin-only management routes
     //TODO: check if it works
-    //TODO: make admin page
-    @GetMapping("/grade/assignTeacher")
-    public String assignTeacherToGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
-        if(gradeService.gradeExists(id) && teacherService.teacherExists(teacherId)) {
-            if (teacherService.assignGrade(teacherId, id) != null) {
-                return "redirect:/profile";
-            } else {
-                return "errors/error";
-            }
-        }else {
-            return "errors/404";
-        }
-    }
-    @GetMapping("/grade/assignUser")
-    public String assignUserToGrade(Model model, @RequestParam Long id, @RequestParam String userId){
-       if(gradeService.gradeExists(id) && userService.userExists(userId)) {
-           if(userService.assignGrade(userId, id) != null){
-               return getUserProfile(model,userId);
-           }else{
-               return "errors/error";
-           }
-       }else {
-           return "errors/404";
-       }
-    }
 
-    @GetMapping("/department/assignTeachers")
-    public String assignTeacherToDepartment(Model model, @RequestParam Long id, @RequestParam String teacherId){
-        if(teacherService.setDepartment(teacherId, id) != null){
-            return "redirect:/teacher/"+teacherId;
-        }else{
-            return "errors/404";
-        }
-    }
     
     //Modify teachers list of a Grade
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -728,7 +705,7 @@ public class WebController {
                 }
                 //Remove the teachers that are not in the list. Check if the teacher really is in the grade
                 for (Teacher t: oldTeachers){
-                    if(!teacherList.contains(t.getName()) && t.getGrades().contains(gradeService.read(id))){
+                    if(!teacherList.contains(t.getId()) && t.getGrades().contains(gradeService.read(id))){
                         gradeService.removeTeacherFromGrade(id,t.getId());
                     }
                 }
@@ -758,7 +735,7 @@ public class WebController {
                 //Remove the teachers that are not in the list. Check if the teacher really is in the department
                 if(!oldTeachers.isEmpty()){
                     for (Teacher t: oldTeachers){
-                        if(!teacherList.contains(t.getName()) && t.getDepartment().equals(departmentService.read(id))){
+                        if(!teacherList.contains(t.getId()) && t.getDepartment().equals(departmentService.read(id))){
                             departmentService.removeTeacherFromDept(id,t);
                         }
                     }
@@ -876,6 +853,39 @@ public class WebController {
     
     // OLD CONTROLLER METHODS //
     /*
+    @GetMapping("/grade/assignTeacher")
+    public String assignTeacherToGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
+        if(gradeService.gradeExists(id) && teacherService.teacherExists(teacherId)) {
+            if (teacherService.assignGrade(teacherId, id) != null) {
+                return "redirect:/profile";
+            } else {
+                return "errors/error";
+            }
+        }else {
+            return "errors/404";
+        }
+    }
+    @GetMapping("/grade/assignUser")
+    public String assignUserToGrade(Model model, @RequestParam Long id, @RequestParam String userId){
+       if(gradeService.gradeExists(id) && userService.userExists(userId)) {
+           if(userService.assignGrade(userId, id) != null){
+               return getUserProfile(model,userId);
+           }else{
+               return "errors/error";
+           }
+       }else {
+           return "errors/404";
+       }
+    }
+
+    @GetMapping("/department/assignTeachers")
+    public String assignTeacherToDepartment(Model model, @RequestParam Long id, @RequestParam String teacherId){
+        if(teacherService.setDepartment(teacherId, id) != null){
+            return "redirect:/teacher/"+teacherId;
+        }else{
+            return "errors/404";
+        }
+    }
     @PostMapping("/teacher/add")
     public String postTeacher(Model model,
                               @RequestParam String name,
