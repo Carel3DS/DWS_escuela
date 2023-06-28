@@ -27,9 +27,32 @@
                                 <h4 class="card-title fw-bold text-light">Ubicación</h4>
                                 <p class="card-title fw-bold text-light"><em><span style="font-weight: normal !important;" th:text="${department.location}">{{location}}</span></em></p>
                                 <h4 class="card-title fw-bold text-light">Profesores</h4>
-                                <ul class="list-group select">
-                                    <li class="list-group-item clickable" th:each="teacher: ${department.teachers}" th:attr="onclick=|window.location='/teacher/${teacher.id}'|" ><span th:text="|${teacher.name} ${teacher.surname}|"></span></li>
+                                <ul class="list-group select" style="max-height: 300px;overflow-x: auto;">
+                                    <li class="list-group-item clickable" th:attr="onclick=|window.location='/teacher/${teacher.id}'|" th:each="teacher: ${department.teachers}"><span th:text="|${teacher.name} ${teacher.surname}|"></span></li>
                                 </ul>
+                            </div>
+                        </div>
+                        <div sec:authorize="hasRole('ROLE_ADMIN')" class="card sticky-top bg-secondary" style="margin-top: 24px;">
+                            <div class="card-body" style="margin-bottom: 24px;padding: 20px 10%;">
+                                <h4 class="card-title fw-bold text-light"></h4>
+                                <h4 class="card-title fw-bold text-primary">Seleccionar profesores</h4>
+                                <form th:action="|/department/assignTeachers?id=${department.id}|" method="post">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <ul class="list-group select" style="max-height: 300px;overflow-y: auto;margin-bottom: 16px;">
+                                        <li class="list-group-item" th:each="teacher: ${teachers}">
+                                            <div>
+                                                <input type="checkbox" name="teachers" style="margin-right: 8px;" th:value="${teacher.id}" th:checked="${#lists.contains(department.teachers, teacher)}">
+                                                <span th:text="|${teacher.name} ${teacher.surname}|"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <p>
+                                        <em>
+                                            <span style="font-weight: normal !important;">Los profesores seleccionados estarán en esta clase</span>
+                                        </em>
+                                    </p>
+                                    <button class="btn btn-primary" type="submit">Aplicar cambios</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -42,26 +65,8 @@
                             <div style="min-height: 160px;" th:utext="${department.description}">
                             </div>
                             <div class="float-end">
-                                <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title">Cómo cambiar de departamento</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Para cambiar de departamento tienes que hacer lo siguiente:</p>
-                                                <ul>
-                                                    <li>Ir a tu perfil y configuración</li>
-                                                    <li>En "Departamento", selecciona este departamento</li>
-                                                    <li>Guarda los cambios</li>
-                                                </ul>
-                                                <p>No se puede cambiar de dpto. directamente desde esta página</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 <a th:if="${belongs}" class="btn btn-sm btn-outline-dark" th:href="|/department/leave|" style="margin-right: 5px;">Abandonar</a>
-                                <a th:if="${teacher != null && !belongs}" class="btn btn-sm btn-secondary" th:href="|/department/join?id=${department.id}|" style="margin-right: 5px;">Unirse</a>
+                                <a th:if="${#authorization.expression('hasRole(''ROLE_TEACHER'')') && !belongs}" class="btn btn-sm btn-secondary" th:href="|/department/join?id=${department.id}|" style="margin-right: 5px;">Unirse</a>
                                 <span th:if="${isAdmin}">
                                     <a class="btn btn-sm btn-primary" th:href="'/department/edit/'+${department.id}" style="margin-right: 5px;">Editar</a>
                                     <a class="btn btn-sm btn-danger" th:href="'/department/delete/'+${department.id}">Eliminar</a>

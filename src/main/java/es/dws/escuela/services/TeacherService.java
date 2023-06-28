@@ -111,7 +111,7 @@ public class TeacherService {
             if(department != null){
                 Department oldDep = teacher.getDepartment();
                 if(oldDep!=null){
-                    departmentService.removeTeacherFromDept(oldDep.getId(),teacherId);
+                    departmentService.removeTeacherFromDept(oldDep.getId(),teacher);
                 }
                 teacher.setDepartment(department);
                 repository.save(teacher);
@@ -131,7 +131,6 @@ public class TeacherService {
         if (teacher != null){
             Grade grade = this.gradeService.read(gradeId);
             if(grade != null && !teacher.getGrades().contains(grade)){
-                teacher.addGrade(grade);
                 this.gradeService.addTeacher(teacher,gradeId);
                 return teacher;
             }else {

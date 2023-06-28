@@ -9,6 +9,8 @@ import jakarta.persistence.TypedQuery;
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,9 +90,23 @@ public class DepartmentService {
         repository.save(department);
     }
 
-    public void removeTeacherFromDept(Long id, String teacherId) {
+    public void removeTeacherFromDept(Long id, Teacher teacher) {
         Department department = this.read(id);
-        department.removeTeacher(teacherId);
+        department.removeTeacher(teacher);
+        teacher.setDepartment(null);
         repository.save(department);
+    }
+
+    public void removeAllTeachersFromDept(Long id) {
+        Department department = this.read(id);
+        for(Teacher t: department.getTeachers()){
+            t.setDepartment(null);
+        }
+        department.setTeachers(new ArrayList<>());
+        repository.save(department);
+    }
+
+    public boolean departmentExists(Long id) {
+        return repository.existsById(id);
     }
 }

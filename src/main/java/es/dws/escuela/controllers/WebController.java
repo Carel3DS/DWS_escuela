@@ -258,7 +258,9 @@ public class WebController {
             model.addAttribute("isTeacher", request.isUserInRole("ROLE_TEACHER"));
             model.addAttribute("isAdmin", request.isUserInRole("ROLE_ADMIN"));
             model.addAttribute("grade",grade);
-            model.addAttribute("teacher",grade.getTeachers());
+            if(request.isUserInRole("ROLE_ADMIN")){
+                model.addAttribute("teachers",teacherService.readAll());
+            }
             return "entities/gradeProfile";
         }else{
             return "errors/404";
@@ -268,10 +270,14 @@ public class WebController {
     public String getDepartmentProfile(Model model, @PathVariable Long id, HttpServletRequest request){
         Department department = departmentService.read(id);
         if(department != null){
+            //Add the attributes into the model
             model.addAttribute("department",department);
             model.addAttribute("teacher",department.getTeachers());
             model.addAttribute("isAdmin",request.isUserInRole("ROLE_ADMIN"));
             model.addAttribute("belongs",request.getUserPrincipal() != null && teacherService.teacherExists(request.getUserPrincipal().getName()) && teacherService.read(request.getUserPrincipal().getName()).getDepartment()!= null && Objects.equals(teacherService.read(request.getUserPrincipal().getName()).getDepartment().getId(), id));
+            if(request.isUserInRole("ROLE_ADMIN")){
+                model.addAttribute("teachers",teacherService.readAll());
+            }
             return "entities/departmentProfile";
         }else{
             return "errors/404";
@@ -696,7 +702,7 @@ public class WebController {
        }
     }
 
-    @GetMapping("/department/assignTeacher")
+    @GetMapping("/department/assignTeachers")
     public String assignTeacherToDepartment(Model model, @RequestParam Long id, @RequestParam String teacherId){
         if(teacherService.setDepartment(teacherId, id) != null){
             return "redirect:/teacher/"+teacherId;
@@ -705,15 +711,73 @@ public class WebController {
         }
     }
     
-    //Remove teacher/user from Grade
-    @GetMapping("/grade/removeTeacher")
-    public String removeTeacherFromGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
-        if(teacherService.removeGrade(teacherId,id) != null){
+    //Modify teachers list of a Grade
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/grade/assignTeachers")
+    public String assignTeachersToGrade(Model model, @RequestParam Long id, String ... teachers){
+        if (teachers != null){
+            List<String> teacherList = new ArrayList<>(List.of(teachers));
+            if(gradeService.gradeExists(id)){
+                //Create a new list to prevent reading by reference
+                List<Teacher> oldTeachers = new ArrayList<>(gradeService.read(id).getTeachers());
+                //Add the new teachers from the teachers list
+                for (String teacherID: teacherList){
+                    if(teacherService.teacherExists(teacherID) && !oldTeachers.contains(teacherService.read(teacherID))){
+                        teacherService.assignGrade(teacherID, id);
+                    }
+                }
+                //Remove the teachers that are not in the list. Check if the teacher really is in the grade
+                for (Teacher t: oldTeachers){
+                    if(!teacherList.contains(t.getName()) && t.getGrades().contains(gradeService.read(id))){
+                        gradeService.removeTeacherFromGrade(id,t.getId());
+                    }
+                }
+                return "redirect:/grade/"+id;
+            }else {
+                return "errors/404";
+            }
+        }else {
             return "redirect:/grade/"+id;
-        }else{
-            return "errors/404";
         }
     }
+    //Modify teachers list of a Department
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/department/assignTeachers")
+    public String assignTeachersToDept(Model model, @RequestParam Long id, String ... teachers){
+        if(teachers != null){
+            List<String> teacherList = new ArrayList<>(List.of(teachers));
+            if(departmentService.departmentExists(id)){
+                //Create a new list to prevent reading by reference
+                List<Teacher> oldTeachers = new ArrayList<>(departmentService.read(id).getTeachers());
+                //Add the new teachers from the teachers list
+                for (String teacherID: teacherList){
+                    if(teacherService.teacherExists(teacherID) && !oldTeachers.contains(teacherService.read(teacherID))){
+                        teacherService.assignDept(teacherID, id);
+                    }
+                }
+                //Remove the teachers that are not in the list. Check if the teacher really is in the department
+                if(!oldTeachers.isEmpty()){
+                    for (Teacher t: oldTeachers){
+                        if(!teacherList.contains(t.getName()) && t.getDepartment().equals(departmentService.read(id))){
+                            departmentService.removeTeacherFromDept(id,t);
+                        }
+                    }
+                }
+                return "redirect:/department/"+id;
+            }else {
+                return "errors/404";
+            }
+        }else {
+            //Remove all teachers from the department
+            if(departmentService.departmentExists(id)){
+                departmentService.removeAllTeachersFromDept(id);
+                return "redirect:/department/"+id;
+            }else {
+                return "errors/404";
+            }
+        }
+    }
+    
     @GetMapping("/grade/removeUser")
     public String removeUserFromGrade(Model model, @RequestParam Long id, @RequestParam String userId){
         if(userService.removeGrade(userId,id) != null){
@@ -736,6 +800,7 @@ public class WebController {
     // ENROLLING GRADE METHODS //
 
     //Self-enrolls a user into a grade
+    //Note: Teachers cannot join to a grade (admins have to assign the grade to the teacher)
     @GetMapping("/grade/enroll")
     public String enroll(@RequestParam Long id){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
@@ -761,10 +826,10 @@ public class WebController {
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
-            removeTeacherFromGrade(model,id,userId);
+            gradeService.removeTeacherFromGrade(id,userId);
             return "redirect:/grade/"+id;
         }else if(roles.contains(new SimpleGrantedAuthority("ROLE_USER"))){
-            removeUserFromGrade(model,id,userId);
+            gradeService.removeUserFromGrade(id,userId);
             return "redirect:/grade/"+id;
         }else {
             return "errors/403";

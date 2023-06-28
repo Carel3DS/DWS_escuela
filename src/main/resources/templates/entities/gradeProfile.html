@@ -20,27 +20,52 @@
         <div class="container">
             <div class="row">
                 <div class="col col-md-5 col-12 py-3">
-                    <div class="card sticky-top bg-primary">
-                        <div class="card-body" style="padding: 20px 10%;">
-                            <h4 class="card-title fw-bold text-light"></h4>
-                            <h4 class="card-title fw-bold text-light">Profesores</h4>
-                            <ul class="list-group select">
-                                <li class="list-group-item clickable" th:each="teacher: ${grade.teachers}" th:attr="onclick=|window.location='/teacher/${teacher.id}'|" ><span th:text="|${teacher.name} ${teacher.surname}|"></span></li>
-                            </ul>
+                    <div class="sticky-top">
+                        <div class="card bg-primary">
+                            <div class="card-body" style="padding: 20px 10%;">
+                                <h4 class="card-title fw-bold text-light"></h4>
+                                <h4 class="card-title fw-bold text-light">Profesores</h4>
+                                <ul class="list-group select" style="max-height: 300px;overflow-x: auto;">
+                                    <li class="list-group-item clickable" th:attr="onclick=|window.location='/teacher/${teacher.id}'|" th:each="teacher: ${grade.teachers}"><span th:text="|${teacher.name} ${teacher.surname}|"></span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div sec:authorize="hasRole('ROLE_ADMIN')" class="card sticky-top bg-secondary" style="margin-top: 24px;">
+                            <div class="card-body" style="margin-bottom: 24px;padding: 20px 10%;">
+                                <h4 class="card-title fw-bold text-light"></h4>
+                                <h4 class="card-title fw-bold text-primary">Seleccionar profesores</h4>
+                                <form th:action="|/grade/assignTeachers?id=${grade.id}|" method="post">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <ul class="list-group select" style="max-height: 300px;overflow-y: auto;margin-bottom: 16px;">
+                                        <li class="list-group-item" th:each="teacher: ${teachers}">
+                                            <div>
+                                                <input type="checkbox" name="teachers" style="margin-right: 8px;" th:value="${teacher.id}" th:checked="${#lists.contains(grade.teachers, teacher)}">
+                                                <span th:text="|${teacher.name} ${teacher.surname}|"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <p>
+                                        <em>
+                                            <span style="font-weight: normal !important;">Los profesores seleccionados estarán en esta clase</span>
+                                        </em>
+                                    </p>
+                                    <button class="btn btn-primary" type="submit">Aplicar cambios</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col py-3">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title fw-bold"><em><span style="font-weight: normal !important;">Apuntado</span></em></h6>
+                            <h6 class="card-title fw-bold" th:if="${profile!=null && #lists.contains(profile.grades, grade)}"><em><span style="font-weight: normal !important;">Apuntado</span></em></h6>
                             <h4 class="card-title fw-bold">Descripción</h4>
                             <p class="card-title fw-bold" th:text="|Año: ${grade.year}|"></p>
                             <div style="min-height: 160px;" th:utext="${grade.description}"></div>
                             <div class="float-end">
                                 <a class="btn btn-sm btn-secondary" th:if="${profile!=null && !isTeacher && !#lists.contains(profile.grades, grade)}" th:href="|/grade/enroll?id=${grade.id}|" style="margin-right: 5px;">Apuntarse</a>
                                 <a class="btn btn-sm btn-secondary" th:if="${profile!=null && #lists.contains(profile.grades, grade)}" th:href="|/grade/leave?id=${grade.id}|" style="margin-right: 5px;">Salir</a>
-                                <span th:if="${isAdmin || profile!=null && #lists.contains(profile.grades, grade)}">
+                                <span th:if="${isAdmin || profile!=null && isTeacher && #lists.contains(profile.grades, grade)}">
                                     <a class="btn btn-sm btn-primary" th:href="|/grade/edit/${grade.id}|" style="margin-right: 5px;">Editar</a>
                                     <a class="btn btn-sm btn-danger" th:href="|/grade/delete/${grade.id}|">Eliminar</a>
                                 </span>

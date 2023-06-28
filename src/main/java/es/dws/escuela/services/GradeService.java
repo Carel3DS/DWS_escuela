@@ -86,8 +86,7 @@ public class GradeService {
     void addTeacher(Teacher teacher, Long gradeId) {
         Grade grade = this.read(gradeId);
         List<Teacher> teachers = grade.getTeachers();
-        teachers.add(teacher);
-        grade.setTeachers(teachers);
+        grade.addTeacher(teacher);
         repository.save(grade);
     }
 
