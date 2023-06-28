@@ -8,6 +8,7 @@ import es.dws.escuela.services.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -370,7 +371,7 @@ public class WebController {
         if(request.isUserInRole("ROLE_ADMIN")){
             Teacher teacher = teacherService.read(id);
             if(teacher != null){
-                model.addAttribute("profile",teacher);
+                model.addAttribute("teacher",teacher);
                 model.addAttribute("isTeacher",true);
                 model.addAttribute("isAdmin",true);
                 model.addAttribute("departments",departmentService.readAll());
@@ -406,7 +407,7 @@ public class WebController {
         if(request.isUserInRole("ROLE_ADMIN")){
             User user = userService.read(id);
             if(user != null){
-                model.addAttribute("profile",user);
+                model.addAttribute("user",user);
                 model.addAttribute("isAdmin",true);
                 return "profileUserForm";
             }else{
@@ -511,7 +512,11 @@ public class WebController {
                 model.addAttribute("text","Se ha eliminado al profesor: "+teacher.getName()+" "+teacher.getSurname());
                 return "home/confirm";
             }else{
-                return "errors/404";
+                if(request.getUserPrincipal().getName().equals(id)){
+                    return "errors/403";
+                }else{
+                    return "errors/404";
+                }
             }
         }else {
             if(!teacherService.teacherExists(id)){
@@ -589,27 +594,36 @@ public class WebController {
     }
     //Delete request. Valid for Both for teacher and user type, but not for admins
     @GetMapping("/profile/delete")
-    public String deleteProfile(){
+    public String deleteProfile(HttpSession session){
         var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             if(teacherService.teacherExists(id) && !roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
-                //Remove session (logout) and delete teacher
+                //Delete teacher and logout
+                session.invalidate();
                 teacherService.delete(id);
-                return "redirect:/logout";
-            }
-            else{
-                return "errors/404";
+                return "redirect:/";
+            } else{
+                if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+                    return "errors/403";
+                }else{
+                    return "errors/404";
+                }
             }
         }else if(roles.contains(new SimpleGrantedAuthority("ROLE_USER")) && !roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
             String id = SecurityContextHolder.getContext().getAuthentication().getName();
             if(userService.read(id) != null){
                 //Remove session (logout) and delete teacher
+                session.invalidate();
                 userService.delete(id);
-                return "redirect:/logout";
+                return "redirect:/";
             }
             else{
-                return "errors/404";
+                if(roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+                    return "errors/403";
+                }else{
+                    return "errors/404";
+                }
             }
         }else{
             return "errors/403";

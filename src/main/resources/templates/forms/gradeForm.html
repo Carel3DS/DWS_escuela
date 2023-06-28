@@ -25,6 +25,7 @@
                 <div class="col-md-6 col-md-8">
                     <div>
                         <form class="p-3 p-xl-4" th:action="${id != null} ? '/grade/edit/'+${id}:'/grade/add'" method="post" th:object="${grade}">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                             <div style="display: none" th:if="${id != null}">
                                 <input name = "id" th:value="${id != null} ? ${id}">
                             </div>

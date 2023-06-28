@@ -25,6 +25,7 @@
                 <div class="col-md-6 col-md-8">
                     <div>
                         <form class="p-3 p-xl-4" th:action="${department.id != null} ? '/department/edit/'+${department.id} : '/department/add'" method="post" data-bs-theme="light" th:object="${department}">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                             <div class="mb-3"><input class="form-control" type="text" id="name-1" name="name" placeholder="Nombre" th:value="${department != null} ? *{name}"></div>
                             <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('name')}">
                                 <span th:each="err : ${#fields.errors('name')}" th:text="${err}"></span>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="light" lang="es">
+<html data-bs-theme="light" lang="es" xmlns:sec="http://www.w3.org/1999/html">
 
 <head>
     <meta charset="utf-8">
@@ -24,6 +24,7 @@
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
                     <h2 class="display-6 fw-bold mb-5">Iniciar Sesión</h2>
                     <form method="post" data-bs-theme="light">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                         <div class="mb-3"><input class="shadow form-control" name="user" placeholder="Nombre de usuario"></div>
                         <div class="mb-3">
                             <div class="shadow input-group"><input class="form-control" type="password" id="password" placeholder="Contraseña" name="pass"><button class="btn btn-primary" id="toggle-password" type="button"></button></div>

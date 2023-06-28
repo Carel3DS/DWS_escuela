@@ -21,6 +21,7 @@
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
                     <h2 class="display-6 fw-bold mb-5">Regístrate como&nbsp;<span class="underline pb-1"><strong>Profesor</strong></span></h2>
                     <form action="/teacher/add" method="post" data-bs-theme="light" th:object="${teacher}">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                         <div class="mb-3"><input class="form-control" type="text" name="name" placeholder="Nombre">
                             <div class="alert alert-danger" role="alert" style="margin-top: 8px;" th:if="${#fields.hasErrors('name')}">
                                 <span th:each="err : ${#fields.errors('name')}" th:text="${err}"></span>

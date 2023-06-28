@@ -22,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 
@@ -40,6 +41,7 @@ public class SecurityConfiguration {
     @Bean
     @Order(2)
     public SecurityFilterChain filterWebChain(HttpSecurity http) throws Exception {
+
         http.securityMatcher("/**")
         .authorizeHttpRequests((authz) ->{
                 //Allow public web views
@@ -103,9 +105,8 @@ public class SecurityConfiguration {
         //Set Logout
         http.logout(Customizer.withDefaults());
 
-        //Disable CSRF for now
-        http.csrf(AbstractHttpConfigurer::disable);
-
+        //Enable CSRF
+        http.csrf(Customizer.withDefaults());
 
         return http.build();
     }

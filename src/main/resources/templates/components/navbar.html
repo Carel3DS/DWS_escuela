@@ -28,7 +28,13 @@
                     </button>
                     <ul class="dropdown-menu" style="">
                         <li><a class="dropdown-item" href="/profile">Perfil</a></li>
-                        <li><a class="dropdown-item text-danger" href="/logout">Cerrar sesión</a></li>
+
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <!-- Recuerde validar su billete antes de salir, gracias por usar Cercanías Madrid-->
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                <input type="submit"  class="dropdown-item text-danger" value="Cerrar Sesión" />
+                            </form>
                     </ul>
                 </div>
 

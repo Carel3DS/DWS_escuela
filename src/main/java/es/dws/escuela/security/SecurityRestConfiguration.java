@@ -61,7 +61,7 @@ public class SecurityRestConfiguration {
                 );
         //Use HTTP Basic
         http.httpBasic(Customizer.withDefaults());
-        //Disable CSRF for now
+        //Disable CSRF
         http.csrf(AbstractHttpConfigurer::disable);
         //Make session Stateless
         http.sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
