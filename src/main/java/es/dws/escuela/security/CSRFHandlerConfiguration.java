@@ -2,6 +2,7 @@ package es.dws.escuela.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,9 +19,9 @@ public class CSRFHandlerConfiguration implements WebMvcConfigurer {
 }
 class CSRFHandlerInterceptor implements HandlerInterceptor {
     @Override
-    public void postHandle(HttpServletRequest request,
-                           HttpServletResponse response,
-                           Object handler,
+    public void postHandle(@NotNull HttpServletRequest request,
+                           @NotNull HttpServletResponse response,
+                           @NotNull Object handler,
                            ModelAndView modelAndView)
             throws Exception
     {
@@ -28,7 +29,11 @@ class CSRFHandlerInterceptor implements HandlerInterceptor {
             CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
             if (token != null) {
                 modelAndView.addObject("token", token.getToken());
+            }else {
+                throw new Exception();
             }
+        }else {
+            throw new Exception();
         }
     }
 

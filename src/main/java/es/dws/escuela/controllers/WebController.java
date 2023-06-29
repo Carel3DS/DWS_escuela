@@ -9,20 +9,19 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,7 @@ public class WebController {
     @Autowired
     UserService userService;
 
-
+    //Create some default entities
     @PostConstruct
     public void init(){
         //Create some instances
@@ -80,31 +79,22 @@ public class WebController {
     }
 
     @GetMapping("/login")
-    public String login(User user, HttpServletRequest request, BindingResult br){
-        if(request.getUserPrincipal()==null){
+    public String login(HttpServletRequest request){
+        if(request.getUserPrincipal() == null){
             return "home/login";
         }else {
             return "redirect:/";
         }
     }
-    /*@PostMapping("/login")
-    public String postLogin(User user, HttpServletRequest request, BindingResult br) throws ServletException {
-        if(request.getUserPrincipal()==null){
-            if(br.hasErrors()){
-                return "home/login";
-            }
-            try {
-                request.login(user.getId(), user.getPass());
-                return "redirect:/profile";
-            } catch (ServletException e){
-                //Whatever it throws, for user it will be credentials error
-                br.addError(new FieldError("user","credentials",e.getMessage()));
-                return "home/login";
-            }
+    @GetMapping("/login-error")
+    public String loginError(HttpServletRequest request){
+        if(request.getUserPrincipal() == null){
+            return "home/loginError";
         }else {
             return "redirect:/";
         }
-    }*/
+    }
+
     @GetMapping("/signup")
     public String signup(User user, HttpServletRequest request){
         if(request.getUserPrincipal()==null){
@@ -362,11 +352,6 @@ public class WebController {
             if(br.hasErrors()){
                 return "forms/gradeForm";
             }
-            /*//ad-hoc Not-null validation
-            if(grade.getYear() == null){
-                br.addError(new FieldError("grade","year","Age is required"));
-                return "forms/gradeForm";
-            }*/
             grade.setTeachers(new ArrayList<>());
             Teacher teacher = teacherService.read(teacherId);
             grade.addTeacher(teacher);
@@ -849,69 +834,4 @@ public class WebController {
             return "errors/404";
         }
     }
-    
-    
-    // OLD CONTROLLER METHODS //
-    /*
-    @GetMapping("/grade/assignTeacher")
-    public String assignTeacherToGrade(Model model, @RequestParam Long id, @RequestParam String teacherId){
-        if(gradeService.gradeExists(id) && teacherService.teacherExists(teacherId)) {
-            if (teacherService.assignGrade(teacherId, id) != null) {
-                return "redirect:/profile";
-            } else {
-                return "errors/error";
-            }
-        }else {
-            return "errors/404";
-        }
-    }
-    @GetMapping("/grade/assignUser")
-    public String assignUserToGrade(Model model, @RequestParam Long id, @RequestParam String userId){
-       if(gradeService.gradeExists(id) && userService.userExists(userId)) {
-           if(userService.assignGrade(userId, id) != null){
-               return getUserProfile(model,userId);
-           }else{
-               return "errors/error";
-           }
-       }else {
-           return "errors/404";
-       }
-    }
-
-    @GetMapping("/department/assignTeachers")
-    public String assignTeacherToDepartment(Model model, @RequestParam Long id, @RequestParam String teacherId){
-        if(teacherService.setDepartment(teacherId, id) != null){
-            return "redirect:/teacher/"+teacherId;
-        }else{
-            return "errors/404";
-        }
-    }
-    @PostMapping("/teacher/add")
-    public String postTeacher(Model model,
-                              @RequestParam String name,
-                              @RequestParam String surname,
-                              @RequestParam String pass,
-                              @RequestParam String description,
-                              @RequestParam int age){
-        teacherService.create(new Teacher(name,surname.split(" ")[0],pass,description,age));
-        return getTeachers(model);
-    }
-    @PostMapping("/department/add")
-    public String postDepartment(Model model,
-                                 @RequestParam String name,
-                                 @RequestParam String location,
-                                 @RequestParam String description){
-        departmentService.create(new Department(name,location,description));
-        return getDepartments(model);
-    }
-    @PostMapping("/grade/add")
-    public String postGrade(Model model,
-                            @RequestParam String name,
-                            @RequestParam Integer year,
-                            @RequestParam String description){
-        gradeService.create(new Grade(name,description,year));
-        return getGrades(model);
-    }*/
-
-
 }

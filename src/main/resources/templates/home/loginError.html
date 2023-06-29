@@ -20,11 +20,14 @@
                 <div class="col-md-6 text-center"><img class="img-fluid w-100" src="/assets/img/illustrations/login.svg"></div>
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
                     <h2 class="display-6 fw-bold mb-5">Iniciar Sesión</h2>
-                    <form method="post" data-bs-theme="light">
+                    <form action="/login" method="post" data-bs-theme="light">
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
-                        <div class="mb-3"><input class="shadow form-control" name="user" placeholder="Nombre de usuario"></div>
+                        <div class="mb-3"><input class="shadow form-control" oninput="$('#err-alert').slideUp(500);" name="user" placeholder="Nombre de usuario"></div>
                         <div class="mb-3">
-                        <input class="shadow form-control" type="password" id="password" placeholder="Contraseña" name="pass" oninput="$('#alert').slideUp(500);">
+                            <div class="shadow input-group"><input class="form-control" oninput="$('#err-alert').slideUp(500);" type="password" id="password" placeholder="Contraseña" name="pass"><button class="btn btn-primary" id="toggle-password" type="button"></button></div>
+                            <div class="alert alert-danger shadow" role="alert" id="err-alert">
+                                <span>Usuario o contraseña incorrectos</span>
+                            </div>
                         </div>
                         <div class="mb-5"><button class="btn btn-primary shadow" type="submit" style="margin-top: 6px;">Log in</button></div>
                     </form>
