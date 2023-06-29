@@ -111,6 +111,7 @@ public class Teacher{
         this.age = age;
         this.department = null;
         this.grades = new ArrayList<>();
+        this.description = description;
         //Teachers cannot be admin
         this.roles = new ArrayList<>(List.of(roles));
     }
