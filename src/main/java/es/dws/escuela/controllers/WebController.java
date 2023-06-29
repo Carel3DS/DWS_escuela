@@ -805,7 +805,7 @@ public class WebController {
         String teacherId = SecurityContextHolder.getContext().getAuthentication().getName();
         Department department = departmentService.read(id);
         if(department != null){
-            //User must not be a teacher
+            //User must be a teacher
             if(roles.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
                 teacherService.assignDept(teacherId, id);
                 return "redirect:/department/"+id;

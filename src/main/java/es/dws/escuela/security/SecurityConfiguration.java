@@ -44,15 +44,16 @@ public class SecurityConfiguration {
 
                 //Make public some entity views
                 authz.requestMatchers("/grade").permitAll();
-                authz.requestMatchers(regexMatcher("/grade\\/\\d+")).permitAll();
+                authz.requestMatchers(regexMatcher("/grade\\/\\d+(\\?token=.+)?")).permitAll();
                 authz.requestMatchers("/gradeByName").permitAll();
                 authz.requestMatchers("/teacher").permitAll();
-                authz.requestMatchers(regexMatcher("/teacher\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
-                authz.requestMatchers(regexMatcher("/user\\/[A-Za-z]+.[A-Za-z]+")).permitAll();
+                authz.requestMatchers(regexMatcher("/teacher\\/[A-Za-z]+.[A-Za-z]+(\\?token=.+)?")).permitAll();
+                authz.requestMatchers(regexMatcher("/user\\/[A-Za-z]+.[A-Za-z]+(\\?token=.+)?")).permitAll();
                 authz.requestMatchers("/teacher/add").permitAll();
                 authz.requestMatchers("/teacherByAge").permitAll();
                 authz.requestMatchers("/department").permitAll();
-                authz.requestMatchers(regexMatcher("/department\\/\\d+")).permitAll();
+                //authz.requestMatchers(regexMatcher("/department\\/\\d+")).permitAll();
+                authz.requestMatchers(regexMatcher("/department\\/\\d+(\\?token=.+)?")).permitAll();
                 authz.requestMatchers("/departmentByName").permitAll();
 
                 //Authenticated views
