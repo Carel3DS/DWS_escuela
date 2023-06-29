@@ -32,8 +32,6 @@ class CSRFHandlerInterceptor implements HandlerInterceptor {
             }else {
                 throw new Exception();
             }
-        }else {
-            throw new Exception();
         }
     }
 
