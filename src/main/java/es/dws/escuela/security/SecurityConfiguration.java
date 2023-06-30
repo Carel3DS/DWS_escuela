@@ -95,7 +95,6 @@ public class SecurityConfiguration {
         });
         //Set Logout
         http.logout(Customizer.withDefaults());
-
         //Enable CSRF
         http.csrf(Customizer.withDefaults());
 

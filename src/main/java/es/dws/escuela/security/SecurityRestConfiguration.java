@@ -19,7 +19,7 @@ public class SecurityRestConfiguration {
         http.securityMatcher("/api/**")
                 //Authorize requests from these routes
                 .authorizeHttpRequests((authz) ->{
-                            authz.requestMatchers(HttpMethod.GET,"/test").authenticated();
+
                             //Allow public API requests
                             authz.requestMatchers(HttpMethod.GET,"/api/grade").permitAll();
                             authz.requestMatchers(HttpMethod.GET,"/api/grade/*").permitAll();
@@ -52,13 +52,13 @@ public class SecurityRestConfiguration {
                         }
                 );
         //Use HTTP Basic
-        http.httpBasic(Customizer.withDefaults());
+        http.securityMatcher("/api/**").httpBasic(Customizer.withDefaults());
         //Disable CSRF
-        http.csrf(AbstractHttpConfigurer::disable);
+        http.securityMatcher("/api/**").csrf(AbstractHttpConfigurer::disable);
         //Make session Stateless
-        http.sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.securityMatcher("/api/**").sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         //Disable login form
-        http.formLogin(AbstractHttpConfigurer::disable);
+        http.securityMatcher("/api/**").formLogin(AbstractHttpConfigurer::disable);
         //Build the configuration
         return http.build();
     }

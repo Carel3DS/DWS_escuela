@@ -69,7 +69,7 @@ public class User {
         this.name = name;
         this.surname = surname;
         this.id = "al."+name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
-        this.email = this.id+"@urdj.es";
+        this.email = this.id+"@alumnos.urdj.es";
         this.pass = pass;
         this.description = description;
         this.grades = new ArrayList<>();
@@ -81,7 +81,7 @@ public class User {
         this.name = name;
         this.surname = surname;
         this.id = "al."+name.toLowerCase().replace(" ","")+"."+surname.toLowerCase();
-        this.email = this.id+"@urdj.es";
+        this.email = this.id+"@alumnos.urdj.es";
         this.pass = pass;
         this.grades = new ArrayList<>();
         this.roles = new ArrayList<>(List.of("USER"));

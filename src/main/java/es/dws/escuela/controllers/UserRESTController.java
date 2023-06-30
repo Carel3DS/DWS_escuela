@@ -2,6 +2,7 @@ package es.dws.escuela.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import es.dws.escuela.entities.Groups;
+import es.dws.escuela.entities.Teacher;
 import es.dws.escuela.entities.User;
 import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.UserService;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,7 +31,7 @@ public class UserRESTController {
     @PostMapping("/user")
     @JsonView(Views.User.class)
     public ResponseEntity<User> post(@RequestBody @Validated(Groups.UserGroup.class) User user){
-        user.setPass(passwordEncoder.encode(user.getPass()));
+        user = new User(user.getName(),user.getSurname(),user.getPass(), user.getDescription());
         return new ResponseEntity<>(service.create(user),HttpStatus.CREATED);
     }
     @GetMapping("/user")
@@ -52,7 +54,9 @@ public class UserRESTController {
     @PutMapping("/user/{id}")
     @JsonView(Views.User.class)
     public ResponseEntity<User> put(@PathVariable String id, @RequestBody @Validated(Groups.UserOptGroup.class) User user){
-        User newUser = service.update(id, user);
+        User newUser = new User(user.getName(),user.getSurname(), user.getPass());
+        newUser.setDescription(user.getDescription());
+        newUser = service.update(id, user);
         if (newUser != null){
             return new ResponseEntity<>(newUser, HttpStatus.OK);
         }else{
@@ -71,20 +75,5 @@ public class UserRESTController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-    //Self-delete
-    @DeleteMapping("/user")
-    @JsonView(Views.User.class)
-    public ResponseEntity<User> deleteSelf(){
-        String id = SecurityContextHolder.getContext().getAuthentication().getName();
-        var role = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        //Ensure the user exists and it's not a teacher
-        if(id != null && role.contains(new SimpleGrantedAuthority("ROLE_USER")) && !role.contains(new SimpleGrantedAuthority("ROLE_TEACHER"))){
-            User user = service.delete(id);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }else {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-    }
-
+    
 }

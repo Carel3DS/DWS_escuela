@@ -24,6 +24,7 @@ public class DepartmentRESTController {
     @PostMapping("/department")
     @JsonView(Views.Department.class)
     public ResponseEntity<Department> post(@Validated(Groups.DepartmentGroup.class) @RequestBody Department department){
+        department = new Department(department.getName(),department.getLocation(),department.getDescription());
         return new ResponseEntity<>(service.create(department),HttpStatus.CREATED);
     }
     @GetMapping("/department")
@@ -45,8 +46,9 @@ public class DepartmentRESTController {
 
     @PutMapping("/department/{id}")
     @JsonView(Views.Department.class)
-    public ResponseEntity<Department> put(@PathVariable Long id, @RequestBody @Validated(Groups.DepartmentOptGroup.class) Department newDept){
-        Department newDepartment = service.update(id, newDept);
+    public ResponseEntity<Department> put(@PathVariable Long id, @RequestBody @Validated(Groups.DepartmentOptGroup.class) Department department){
+        department = new Department(department.getName(),department.getLocation(),department.getDescription());
+        Department newDepartment = service.update(id, department);
         if (newDepartment != null){
             return new ResponseEntity<>(newDepartment, HttpStatus.OK);
         }else{

@@ -24,6 +24,7 @@ public class GradeRESTController {
     @PostMapping("/grade")
     @JsonView(Views.Grade.class)
     public ResponseEntity<Grade> post(@Validated(Groups.GradeGroup.class) @RequestBody Grade grade){
+        grade = new Grade(grade.getName(), grade.getDescription(), grade.getYear());
         return new ResponseEntity<>(service.create(grade),HttpStatus.CREATED);
     }
     @GetMapping("/grade")
@@ -46,6 +47,7 @@ public class GradeRESTController {
     @PutMapping("/grade/{id}")
     @JsonView(Views.Grade.class)
     public ResponseEntity<Grade> put(@PathVariable Long id, @RequestBody @Validated(Groups.GradeOptGroup.class) Grade grade){
+        grade = new Grade(grade.getName(), grade.getDescription(), grade.getYear());
         Grade newGrade = service.update(id, grade);
         if (newGrade != null){
             return new ResponseEntity<>(newGrade, HttpStatus.OK);
