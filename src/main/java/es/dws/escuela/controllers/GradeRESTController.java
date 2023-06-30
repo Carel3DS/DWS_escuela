@@ -5,8 +5,6 @@ import es.dws.escuela.entities.Grade;
 import es.dws.escuela.entities.Groups;
 import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.GradeService;
-import es.dws.escuela.services.TeacherService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +19,11 @@ public class GradeRESTController {
 
     @Autowired
     private GradeService service;
-    @Autowired
-    private TeacherService teacherService;
+
     //REST GRADE
     @PostMapping("/grade")
     @JsonView(Views.Grade.class)
-    public ResponseEntity<Grade> post(@RequestBody Grade grade){
+    public ResponseEntity<Grade> post(@Validated(Groups.GradeGroup.class) @RequestBody Grade grade){
         return new ResponseEntity<>(service.create(grade),HttpStatus.CREATED);
     }
     @GetMapping("/grade")
@@ -48,7 +45,7 @@ public class GradeRESTController {
 
     @PutMapping("/grade/{id}")
     @JsonView(Views.Grade.class)
-    public ResponseEntity<Grade> put(@PathVariable Long id, @RequestBody @Validated(Groups.GradeGroup.class) Grade grade){
+    public ResponseEntity<Grade> put(@PathVariable Long id, @RequestBody @Validated(Groups.GradeOptGroup.class) Grade grade){
         Grade newGrade = service.update(id, grade);
         if (newGrade != null){
             return new ResponseEntity<>(newGrade, HttpStatus.OK);

@@ -5,7 +5,6 @@ import es.dws.escuela.entities.Groups;
 import es.dws.escuela.entities.User;
 import es.dws.escuela.entities.Views;
 import es.dws.escuela.services.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +28,7 @@ public class UserRESTController {
     //REST USER
     @PostMapping("/user")
     @JsonView(Views.User.class)
-    public ResponseEntity<User> post(@RequestBody @Valid User user){
+    public ResponseEntity<User> post(@RequestBody @Validated(Groups.UserGroup.class) User user){
         user.setPass(passwordEncoder.encode(user.getPass()));
         return new ResponseEntity<>(service.create(user),HttpStatus.CREATED);
     }
@@ -52,7 +51,7 @@ public class UserRESTController {
 
     @PutMapping("/user/{id}")
     @JsonView(Views.User.class)
-    public ResponseEntity<User> put(@PathVariable String id, @RequestBody @Validated(Groups.UserGroup.class) User user){
+    public ResponseEntity<User> put(@PathVariable String id, @RequestBody @Validated(Groups.UserOptGroup.class) User user){
         User newUser = service.update(id, user);
         if (newUser != null){
             return new ResponseEntity<>(newUser, HttpStatus.OK);
